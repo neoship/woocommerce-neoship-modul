@@ -175,6 +175,8 @@ class Neoship_Admin {
 		if (!current_user_can('manage_options')) {
 			return;
 		}
+
+		$this->api->login(true);
 	
 		?>
 			<h1>Neoship</h1>

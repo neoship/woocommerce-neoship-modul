@@ -155,6 +155,14 @@ msgstr "Exportovať"
 msgid "You are trying Neoship action on orders which are not imported to neoship"
 msgstr "Snažíte sa vykonať Neoship akciu nad objednávkami, ktoré neboli exportované do neoshipu"
 
+#: includes/class-neoship-neoshipapi.php:27
+msgid "Bad login credentials"
+msgstr "Zlé prihlasovacie údaje"
+
+#: includes/class-neoship-neoshipapi.php:30
+msgid "Login credentials are correct"
+msgstr "Prihlasovacie údaje sú správne"
+
 #: includes/class-neoship-neoshipapi.php:200
 msgid "Something is wrong. Please refresh the page and try again"
 msgstr "Niečo je zle. Prosím, obnovte stránku"
@@ -168,6 +176,10 @@ msgstr ""
 #: neoship.php:51
 msgid "For using neoship you need activate WooCommerce plugin"
 msgstr "Pre používanie Neoshipu, musíte mať aktivovaný WooCommerce plugin"
+
+#: neoship.php:80
+msgid "For using neoship you need WooCommerce version"
+msgstr "Pre používanie Neoshipu potrebujete WooCommerce verziu"
 
 #: public/class-neoship-public.php:130
 msgid "Please fill parcelshop"

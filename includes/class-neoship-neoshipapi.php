@@ -10,11 +10,11 @@ class NeoshipApi
         $this->curl = curl_init();
     }
 
-    private function login(){
+    public function login($test = false){
         $this->loginData = get_option('neoship_login');
         
         if($this->loginData == false) {
-            $this->errorMessage( __("Please setup neoship login data"));
+            $this->errorMessage( __('Please setup neoship login credentials', 'neohsip'), !$test);
         }
 
         $url = NEOSHIP_API_URL . '/oauth/v2/token?client_id='.urlencode($this->loginData['clientid']).'&client_secret='.urlencode($this->loginData['clientsecret']).'&grant_type=client_credentials';
@@ -24,10 +24,35 @@ class NeoshipApi
         $response = curl_exec($this->curl);
 
         if (curl_getinfo($this->curl, CURLINFO_HTTP_CODE) != 200){
-            $this->errorMessage( __("Bad login data") );
+            $this->errorMessage( __('Bad login credentials', 'neoship'), !$test );
+            return;
         }
         
         $this->accessData = json_decode($response);
+        
+        if($test) {
+            $this->saveUserId();
+            $this->successMessage( __('Login credentials are correct', 'neoship'), !$test );
+        }
+    }
+
+    public function saveUserId(){
+        if ($this->accessData == false){
+            $this->login();
+        }
+
+        $url = NEOSHIP_API_URL . '/user/?' . http_build_query($this->accessData);
+        curl_setopt($this->curl, CURLOPT_URL, $url);
+        $response = curl_exec($this->curl);      
+
+        if (curl_getinfo($this->curl, CURLINFO_HTTP_CODE) != 200){
+            $this->errorMessage( __("Something is wrong. Please refresh the page and try again") );
+        }
+        
+        $user = json_decode($response, true);
+
+        $this->loginData['userid'] = $user['id'];
+        update_option('neoship_login', $this->loginData);
     }
 
     public function getUserAddress(){
@@ -133,15 +158,26 @@ class NeoshipApi
         return $currencyIdsByCode;
     }
 
-    private function errorMessage($message){
+    private function errorMessage($message, $exit = true){
         ?>
-            <div class="wrap">
-                <div class="notice notice-error is-dismissible">
-                    <p><?php echo $message ?></p>
-                </div>
+            <div class="notice error notice-error is-dismissible">
+                <p><?php echo $message ?></p>
             </div>
         <?php
-        exit();
+        if($exit){
+            exit();
+        }
+    }
+
+    private function successMessage($message, $exit = true){
+        ?>
+            <div class="notice updated notice-success is-dismissible">
+                <p><?php echo $message ?></p>
+            </div>
+        <?php
+        if($exit){
+            exit();
+        }
     }
 
     public function printSticker($template,$referenceNumber){
