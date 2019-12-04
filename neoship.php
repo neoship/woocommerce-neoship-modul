@@ -24,8 +24,8 @@
  * Text Domain:       neoship
  * Domain Path:       /languages
  * 
- * WC requires at least: 2.2
- * WC tested up to: 3.8.0
+ * WC requires at least: 3.3
+ * WC tested up to: 3.8.1
  *
  * Copyright: © 2009-2015 WooCommerce.
  * License: GNU General Public License v3.0
@@ -45,10 +45,42 @@ if ( !in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', 
 	return;
 }
 
+/**
+ * check WooCommerce version
+ */
+if( ! function_exists('get_plugin_data') ){
+	require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+}
+$plugin_folder = get_plugins( '/' . 'woocommerce' );
+$plugin_file = 'woocommerce.php';
+
+if ( isset( $plugin_folder[$plugin_file]['Version'] ) ) {
+	$version = explode('.', $plugin_folder[$plugin_file]['Version']);
+	if($version[0] <= 3 && $version[1] <=2) {
+		add_action( 'admin_notices', 'errorVersionWC' );
+		return;
+	}
+} else {
+	add_action( 'admin_notices', 'errorVersionWC' );
+	return;
+}
+
 function errorMissingWC() {
 	?>
        <div class="notice notice-error">
           <p><?php _e( 'For using neoship you need activate WooCommerce plugin', 'neoship' );?></p>
+       </div>
+	<?php 
+}
+
+function errorVersionWC() {
+	?>
+       <div class="notice notice-error">
+		  <p>
+		  	<?php _e( 'For using neoship you need WooCommerce version', 'neoship' );
+			echo ' ' . '3.3+'  
+			?>
+		</p>
        </div>
 	<?php 
 }
@@ -59,13 +91,9 @@ add_filter( 'admin_body_class', function( $classes ) {
 });
 
 /**
- * Currently plugin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
- * Rename this for your plugin and update it as you release new versions.
+ * include config
  */
-define( 'NEOSHIP_VERSION', '1.0.0' );
-define( 'NEOSHIP_API_URL', 'http://api.neoship.loc' );
-define( 'NEOSHIP_TRACKING_URL', 'http://neoship.loc' );
+require_once plugin_dir_path( __FILE__ ) . 'config.php';
 
 /**
  * The code that runs during plugin activation.
