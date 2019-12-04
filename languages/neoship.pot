@@ -1,0 +1,175 @@
+# Copyright (C) 2019 Mirec
+# This file is distributed under the same license as the Neoship plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Neoship 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/neoship\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2019-12-04T12:02:39+01:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.4.0\n"
+"X-Domain: neoship\n"
+
+#. Plugin Name of the plugin
+msgid "Neoship"
+msgstr ""
+
+#. Plugin URI of the plugin
+msgid "neoship"
+msgstr ""
+
+#. Description of the plugin
+#: admin/class-neoship-admin.php:400
+msgid "Export orders to neoship"
+msgstr ""
+
+#. Author of the plugin
+msgid "Mirec"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://www.kuskosoft.com"
+msgstr ""
+
+#: admin/class-neoship-admin.php:138
+msgid "Login settings"
+msgstr ""
+
+#: admin/class-neoship-admin.php:145
+msgid "Client ID"
+msgstr ""
+
+#: admin/class-neoship-admin.php:153
+msgid "Client secret"
+msgstr ""
+
+#: admin/class-neoship-admin.php:162
+msgid "Please fill data which you receive from neoship"
+msgstr ""
+
+#: admin/class-neoship-admin.php:192
+msgid "Export to Neoship"
+msgstr ""
+
+#: admin/class-neoship-admin.php:193
+msgid "Print stickers (PDF)"
+msgstr ""
+
+#: admin/class-neoship-admin.php:194
+msgid "Print zebra stickers(PDF) 102x152"
+msgstr ""
+
+#: admin/class-neoship-admin.php:195
+msgid "Print zebra stickers (PDF) 80x214"
+msgstr ""
+
+#: admin/class-neoship-admin.php:196
+msgid "Acceptance protocol"
+msgstr ""
+
+#: admin/class-neoship-admin.php:245
+msgid "%d order was exported"
+msgid_plural "%d orders was exported"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin/class-neoship-admin.php:248
+#: admin/class-neoship-admin.php:254
+msgid "%d order was not exported"
+msgid_plural "%d orders was not exported"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin/class-neoship-admin.php:258
+msgid "Order %d"
+msgstr ""
+
+#: admin/class-neoship-admin.php:273
+#: admin/class-neoship-admin.php:282
+msgid "Exported to Neoship"
+msgstr ""
+
+#: admin/class-neoship-admin.php:277
+msgid "Exported to Neoship <span class=\"count\">(%s)</span>"
+msgid_plural "Exported to Neoship <span class=\"count\">(%s)</span>"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin/class-neoship-admin.php:291
+msgid "Tracking"
+msgstr ""
+
+#: admin/class-neoship-admin.php:421
+msgid "Send SMS"
+msgstr ""
+
+#: admin/class-neoship-admin.php:424
+msgid "Send email"
+msgstr ""
+
+#: admin/class-neoship-admin.php:428
+msgid "Hold delivery"
+msgstr ""
+
+#: admin/class-neoship-admin.php:431
+msgid "Saturday delivery"
+msgstr ""
+
+#: admin/class-neoship-admin.php:435
+msgid "Amount of packages"
+msgstr ""
+
+#: admin/class-neoship-admin.php:442
+msgid "Amount of insurance"
+msgstr ""
+
+#: admin/class-neoship-admin.php:446
+msgid "Delivery type"
+msgstr ""
+
+#: admin/class-neoship-admin.php:448
+msgid "Standard delivery"
+msgstr ""
+
+#: admin/class-neoship-admin.php:449
+msgid "Express to 12:00"
+msgstr ""
+
+#: admin/class-neoship-admin.php:450
+msgid "Express to 9:00"
+msgstr ""
+
+#: admin/class-neoship-admin.php:460
+msgid "Export"
+msgstr ""
+
+#: includes/class-neoship-neoshipapi.php:125
+#: includes/class-neoship-neoshipapi.php:200
+msgid "Something is wrong. Please refresh the page and try again"
+msgstr ""
+
+#: includes/class-neoship-neoshipapi.php:180
+msgid "You are trying Neoship action on orders which are not imported to neoship"
+msgstr ""
+
+#: includes/class-neoship-parcelshop-method.php:11
+#: includes/class-neoship-parcelshop-method.php:12
+#: includes/class-neoship-parcelshop-method.php:64
+msgid "Parcelshop"
+msgstr ""
+
+#: neoship.php:51
+msgid "For using neoship you need activate WooCommerce plugin"
+msgstr ""
+
+#: public/class-neoship-public.php:130
+msgid "Please fill parcelshop"
+msgstr ""
+
+#: public/class-neoship-public.php:135
+msgid "Choose correct parcelshop"
+msgstr ""
