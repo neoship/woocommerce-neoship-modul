@@ -124,7 +124,7 @@ class Neoship {
 		
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-neoship-neoshipapi.php';
 		
-		require_once ABSPATH . '/wp-content/plugins/woocommerce/includes/admin/list-tables/class-wc-admin-list-table-orders.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . '/../woocommerce/includes/admin/list-tables/class-wc-admin-list-table-orders.php';
 		
 		$this->loader = new Neoship_Loader();
 

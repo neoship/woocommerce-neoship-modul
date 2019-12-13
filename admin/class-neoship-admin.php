@@ -87,8 +87,8 @@ class Neoship_Admin {
 		 */
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/neoship-admin.css', array(), $this->version, 'all' );
-		wp_enqueue_style('woocommerce_stylesheet', WP_PLUGIN_URL. '/woocommerce/assets/css/admin.css',false,null,"all");
-	
+		wp_enqueue_style('woocommerce_stylesheet', plugin_dir_url( dirname(__FILE__) ). '../woocommerce/assets/css/admin.css',false,null,"all");
+		
 	}
 
 	/**
@@ -111,9 +111,8 @@ class Neoship_Admin {
 		 */
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/neoship-admin.js', array( 'jquery' ), $this->version, false );
-		wp_enqueue_script( 'wc-backbone-modal', WP_PLUGIN_URL . '/woocommerce/assets/js/admin/backbone-modal.min.js' , array( 'jquery' ), null, false );
-		wp_enqueue_script( 'wc-orders', WP_PLUGIN_URL . '/woocommerce/assets/js/admin/wc-orders.min.js' , array( 'underscore', 'backbone', 'wp-util' ), null, false );
-
+		wp_enqueue_script( 'wc-backbone-modal', plugin_dir_path( dirname( __FILE__ ) ) . '/../woocommerce/assets/js/admin/backbone-modal.min.js' , array( 'jquery' ), null, false );
+		wp_enqueue_script( 'wc-orders', plugin_dir_path( dirname( __FILE__ ) ) . '/../woocommerce/assets/js/admin/wc-orders.min.js' , array( 'underscore', 'backbone', 'wp-util' ), null, false );
 	}
 
 	function settingsPage() {
@@ -240,8 +239,8 @@ class Neoship_Admin {
 
 	function neoshipBulkActionAdminNotice() {
 		if ( !empty( $_REQUEST['neoship_export'] ) ) {
-			$success = isset($_REQUEST['success']) ? $_REQUEST['success'] : array();
-			$failed = isset($_REQUEST['failed']) ? $_REQUEST['failed'] : array();
+			$success = isset($_REQUEST['success']) && is_array($_REQUEST['success']) ? $_REQUEST['success'] : array();
+			$failed = isset($_REQUEST['failed']) && is_array($_REQUEST['failed']) ? $_REQUEST['failed'] : array();
 
 			echo '<div class="notice notice-success is-dismissible"><p>';
 			printf(_n("%d order was exported", "%d orders was exported", count($success), 'neoship'), count($success));
@@ -257,7 +256,7 @@ class Neoship_Admin {
 				echo '</p>';
 				foreach ($failed as $value) {
 					echo '<p>';
-					printf( '<strong>'.esc_html__( 'Order %d', 'neoship' ).'</strong>: '.$value['result'], $value['variableNumber']);
+					printf( '<strong>'.esc_html__( 'Order %d', 'neoship' ).'</strong>: '. esc_html($value['result']) , intval($value['variableNumber']));
 					echo '</p>';
 				}
 				echo '</div>';
@@ -265,7 +264,7 @@ class Neoship_Admin {
 		}
 		if( !empty( $_REQUEST['neoship_error'] ) && !empty( $_REQUEST['error'] ) ){
 			echo '<div class="notice notice-error is-dismissible"><p>';
-			echo $_REQUEST['error'];
+			echo esc_html($_REQUEST['error']);
 			echo '</p></div>';
 		}
 	}
@@ -306,7 +305,7 @@ class Neoship_Admin {
 			
 			$packages = array();
 			foreach ( $_POST['packages'] as $pkg ) {
-				$order = wc_get_order( $pkg['id'] )->get_data();
+				$order = wc_get_order( intval($pkg['id']) )->get_data();
 				$parcelshop = false;
 				foreach ($order['meta_data'] as $meta) {
 					if($meta->key == '_parcelshop_id'){
@@ -337,17 +336,21 @@ class Neoship_Admin {
 				}
 				$package['cashOnDeliveryPayment'] = '';
 
-				$package['insurance'] = $pkg['insurance'];
+				$package['insurance'] = sanitize_text_field($pkg['insurance']);
 				$package['insuranceCurrency'] = $currencies['EUR'];
-				$package['holdDelivery'] = isset($pkg['holddelivery']) ? true : false;
-				$package['saturdayDelivery'] = isset($pkg['saturdaydelivery']) ? true : false;
+				if(isset($pkg['holddelivery'])){
+					$package['holdDelivery'] = true;
+				}
+				if(isset($pkg['saturdaydelivery'])){
+					$package['saturdayDelivery'] = true;
+				}
 				$package['express'] = $pkg['deliverytype'] != '' ? intval($pkg['deliverytype']) : null;
 
 				if($parcelshop){
 					$package['parcelShopRecieverName'] = $order['billing']['first_name'].' '.$order['billing']['last_name']; 
 				}
 				else{
-					$package['countOfPackages'] = $pkg['amount'];
+					$package['countOfPackages'] = intval($pkg['amount']);
 				}
 				
 				$notification = array();
@@ -404,7 +407,11 @@ class Neoship_Admin {
 						<table class="wp-list-table widefat fixed striped posts">
 							<tbody>
 								<?php foreach ( $posts_ids as $index => $post_id ) { 
-									$order = wc_get_order( $post_id )->get_data();
+									$id = intval($post_id, 0);
+									if($id == 0){
+										continue;
+									}
+									$order = wc_get_order( $id )->get_data();
 									$parcelshop_id = 0;
 									foreach ($order['meta_data'] as $meta) {
 										if($meta->key == '_parcelshop_id'){

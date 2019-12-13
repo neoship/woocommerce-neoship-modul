@@ -145,8 +145,9 @@ class Neoship_Public {
 	function changeShipping ($order) {
 		if(isset($_POST['parcelshop_id'])){
 			$parcelshops = $this->api->getParcelShops(true);
-			if(array_key_exists($_POST['parcelshop_id'], $parcelshops)) {
-				$parcelshop = $parcelshops[$_POST['parcelshop_id']];
+			$parcelId = intval($_POST['parcelshop_id']);
+			if(array_key_exists($parcelId, $parcelshops)) {
+				$parcelshop = $parcelshops[$parcelId];
 				$address = array(
 					'first_name' => $parcelshop['address']['name'],
 					'last_name'  => '',
