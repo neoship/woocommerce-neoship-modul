@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Fired when the plugin is uninstalled.
  *
@@ -19,10 +18,10 @@
  * For more information, see the following discussion:
  * https://github.com/tommcfarlin/WordPress-Plugin-Boilerplate/pull/123#issuecomment-28541913
  *
- * @link       https://www.kuskosoft.com
- * @since      1.0.0
+ * @link  https://www.kuskosoft.com
+ * @since 1.0.0
  *
- * @package    Neoship
+ * @package Neoship
  */
 
 // If uninstall not called from WordPress, then exit.

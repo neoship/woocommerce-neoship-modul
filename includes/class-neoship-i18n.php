@@ -1,17 +1,21 @@
 <?php
-
 /**
  * Define the internationalization functionality
  *
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
- * @link       https://www.kuskosoft.com
- * @since      1.0.0
+ * @link  https://www.kuskosoft.com
+ * @since 1.0.0
  *
  * @package    Neoship
  * @subpackage Neoship/includes
  */
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Define the internationalization functionality.
@@ -24,13 +28,14 @@
  * @subpackage Neoship/includes
  * @author     Mirec <hutar@kuskosoft.com>
  */
-class Neoship_i18n {
+class Neoship_I18n {
+
 
 
 	/**
 	 * Load the plugin text domain for translation.
 	 *
-	 * @since    1.0.0
+	 * @since 1.0.0
 	 */
 	public function load_plugin_textdomain() {
 

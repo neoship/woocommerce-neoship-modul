@@ -1,14 +1,18 @@
 <?php
-
 /**
  * Fired during plugin deactivation
  *
- * @link       https://www.kuskosoft.com
- * @since      1.0.0
+ * @link  https://www.kuskosoft.com
+ * @since 1.0.0
  *
  * @package    Neoship
  * @subpackage Neoship/includes
  */
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Fired during plugin deactivation.
@@ -22,12 +26,13 @@
  */
 class Neoship_Deactivator {
 
+
 	/**
 	 * Short Description. (use period)
 	 *
 	 * Long Description.
 	 *
-	 * @since    1.0.0
+	 * @since 1.0.0
 	 */
 	public static function deactivate() {
 

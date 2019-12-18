@@ -1,30 +1,53 @@
 <?php
+/**
+ * File define parcelshop shipping method.
+ *
+ * @link  https://www.kuskosoft.com
+ * @since 1.0.0
+ *
+ * @package    Neoship
+ * @subpackage Neoship/includes
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * This is used to define parcelshop shipping method.
+ *
+ * @since      1.0.0
+ * @package    Neoship
+ * @subpackage Neoship/includes
+ * @author     Mirec <hutar@kuskosoft.com>
+ */
 class Neoship_WC_Parcelshop_Shipping_Method extends WC_Shipping_Method {
-    /**
-     * Constructor.
-     *
-     * @param int $instance_id
-     */
-    public function __construct( $instance_id = 0 ) {
-        $this->id           = 'parcelshop';
-        $this->instance_id  = absint( $instance_id );
-        $this->method_title = __( 'Parcelshop', 'neoship' );
-        $this->title = __( 'Parcelshop', 'neoship' );
-        $this->supports     = array(
-            'shipping-zones',
-            'instance-settings',
-            'instance-settings-modal',
-        );
-     
-        $this->init();
-    }
 
-    /**
-     * Initialize custom shiping method.
-     */
-    public function init() {
+	/**
+	 * Constructor.
+	 *
+	 * @param int $instance_id Instance id.
+	 */
+	public function __construct( $instance_id = 0 ) {
+		$this->id           = 'parcelshop';
+		$this->instance_id  = absint( $instance_id );
+		$this->method_title = __( 'Parcelshop', 'neoship' );
+		$this->title        = __( 'Parcelshop', 'neoship' );
+		$this->supports     = array(
+			'shipping-zones',
+			'instance-settings',
+			'instance-settings-modal',
+		);
 
-        // Load the settings.
+		$this->init();
+	}
+
+	/**
+	 * Initialize custom shiping method.
+	 */
+	public function init() {
+
+		// Load the settings.
 		$this->init_form_fields();
 		$this->init_settings();
 
@@ -37,7 +60,7 @@ class Neoship_WC_Parcelshop_Shipping_Method extends WC_Shipping_Method {
 		add_action( 'woocommerce_update_options_shipping_' . $this->id, array( $this, 'process_admin_options' ) );
 	}
 
-    /**
+	/**
 	 * Calculate local pickup shipping.
 	 *
 	 * @param array $package Package information.
@@ -52,11 +75,11 @@ class Neoship_WC_Parcelshop_Shipping_Method extends WC_Shipping_Method {
 		);
 	}
 
-    /**
-     * Init form fields.
-     */
-    public function init_form_fields() {
-        $this->instance_form_fields = array(
+	/**
+	 * Init form fields.
+	 */
+	public function init_form_fields() {
+		$this->instance_form_fields = array(
 			'title'      => array(
 				'title'       => __( 'Title', 'woocommerce' ),
 				'type'        => 'text',
@@ -83,5 +106,5 @@ class Neoship_WC_Parcelshop_Shipping_Method extends WC_Shipping_Method {
 				'desc_tip'    => true,
 			),
 		);
-    }
+	}
 }

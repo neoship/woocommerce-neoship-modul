@@ -4,23 +4,23 @@
  */
 
 .neoship table input{
-    max-width: 100%;
+	max-width: 100%;
 }
 
 .post-type-shop_order .neoship table .order-preview{
-    float: initial;
-    padding: 4px 4px 4px 4px;
+	float: initial;
+	padding: 4px 4px 4px 4px;
 }
 
 .neoship table .order-preview::before{
-    display: none;
+	display: none;
 }
 
 .order-status.status-export-to-neoship{
-    background: #d43e25;
-    color: white;
+	background: #d43e25;
+	color: white;
 }
 
 .widefat .column-wc_actions .export-to-neoship::after{
-    content: "\f319";
+	content: "\f319";
 }

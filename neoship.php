@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The plugin bootstrap file
  *
@@ -8,9 +7,9 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              https://www.kuskosoft.com
- * @since             1.0.0
- * @package           Neoship
+ * @link    https://www.kuskosoft.com
+ * @since   1.0.0
+ * @package Neoship
  *
  * @wordpress-plugin
  * Plugin Name:       Neoship
@@ -23,7 +22,7 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       neoship
  * Domain Path:       /languages
- * 
+ *
  * WC requires at least: 3.3
  * WC tested up to: 3.8.1
  *
@@ -32,66 +31,75 @@
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-// If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-	die;
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	die( 'No script kiddies please!' );
 }
 
 /**
- * Check if WooCommerce is active
- **/
-if ( !in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
-	add_action( 'admin_notices', 'errorMissingWC' );
+ * Check if WooCommerce is active.
+ */
+if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
+	add_action( 'admin_notices', 'neoship_error_missing_wc' );
 	return;
 }
 
 /**
- * check WooCommerce version
+ * Check WooCommerce version.
  */
-if( ! function_exists('get_plugin_data') ){
-	require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+if ( ! function_exists( 'get_plugin_data' ) ) {
+	include_once ABSPATH . 'wp-admin/includes/plugin.php';
 }
-$plugin_folder = get_plugins( '/' . 'woocommerce' );
-$plugin_file = 'woocommerce.php';
+$plugin_folder = get_plugins( '/woocommerce' );
+$plugin_file   = 'woocommerce.php';
 
-if ( isset( $plugin_folder[$plugin_file]['Version'] ) ) {
-	$version = explode('.', $plugin_folder[$plugin_file]['Version']);
-	if($version[0] <= 3 && $version[1] <=2) {
-		add_action( 'admin_notices', 'errorVersionWC' );
+if ( isset( $plugin_folder[ $plugin_file ]['Version'] ) ) {
+	$version = explode( '.', $plugin_folder[ $plugin_file ]['Version'] );
+	if ( $version[0] <= 3 && $version[1] <= 2 ) {
+		add_action( 'admin_notices', 'neoship_error_version_wc' );
 		return;
 	}
 } else {
-	add_action( 'admin_notices', 'errorVersionWC' );
+	add_action( 'admin_notices', 'neoship_error_version_wc' );
 	return;
 }
 
-function errorMissingWC() {
-	?>
-       <div class="notice notice-error">
-          <p><?php _e( 'For using neoship you need activate WooCommerce plugin', 'neoship' );?></p>
-       </div>
-	<?php 
+/**
+ * Output missing woocommerce.
+ */
+function neoship_error_missing_wc() {     ?>
+	<div class="notice notice-error">
+		<p><?php esc_html_e( 'For using neoship you need activate WooCommerce plugin', 'neoship' ); ?></p>
+	</div>
+	<?php
 }
-
-function errorVersionWC() {
-	?>
-       <div class="notice notice-error">
-		  <p>
-		  	<?php _e( 'For using neoship you need WooCommerce version', 'neoship' );
-			echo ' ' . '3.3+'  
-			?>
-		</p>
-       </div>
-	<?php 
-}
-
-add_filter( 'admin_body_class', function( $classes ) {
-	$classes .= ' post-type-shop_order ';
-	return $classes;
-});
 
 /**
- * include config
+ * Output bad woocommerce version.
+ */
+function neoship_error_version_wc() {
+	?>
+	<div class="notice notice-error">
+		<p>
+	<?php
+	esc_html_e( 'For using neoship you need WooCommerce version', 'neoship' );
+	echo ' 3.3+'
+	?>
+		</p>
+	</div>
+	<?php
+}
+
+add_filter(
+	'admin_body_class',
+	function ( $classes ) {
+		$classes .= ' post-type-shop_order ';
+		return $classes;
+	}
+);
+
+/**
+ * Include config.
  */
 require_once plugin_dir_path( __FILE__ ) . 'config.php';
 
@@ -100,7 +108,7 @@ require_once plugin_dir_path( __FILE__ ) . 'config.php';
  * This action is documented in includes/class-neoship-activator.php
  */
 function activate_neoship() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-neoship-activator.php';
+	include_once plugin_dir_path( __FILE__ ) . 'includes/class-neoship-activator.php';
 	Neoship_Activator::activate();
 }
 
@@ -109,7 +117,7 @@ function activate_neoship() {
  * This action is documented in includes/class-neoship-deactivator.php
  */
 function deactivate_neoship() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-neoship-deactivator.php';
+	include_once plugin_dir_path( __FILE__ ) . 'includes/class-neoship-deactivator.php';
 	Neoship_Deactivator::deactivate();
 }
 
@@ -129,10 +137,10 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-neoship.php';
  * then kicking off the plugin from this point in the file does
  * not affect the page life cycle.
  *
- * @since    1.0.0
+ * @since 1.0.0
  */
 function run_neoship() {
-	
+
 	$plugin = new Neoship();
 	$plugin->run();
 
