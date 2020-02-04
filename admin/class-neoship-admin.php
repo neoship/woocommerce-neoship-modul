@@ -124,8 +124,8 @@ class Neoship_Admin {
 		 */
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/neoship-admin.js', array( 'jquery' ), $this->version, false );
-		wp_enqueue_script( 'wc-backbone-modal', plugin_dir_url( dirname( __FILE__ ) ) . '../woocommerce/assets/js/admin/backbone-modal.min.js', array( 'jquery' ), '3.8.1', false );
-		wp_enqueue_script( 'wc-orders', plugin_dir_url( dirname( __FILE__ ) ) . '../woocommerce/assets/js/admin/wc-orders.min.js', array( 'underscore', 'backbone', 'wp-util' ), '3.8.1', false );
+		wp_enqueue_script( 'wc-backbone-modal', plugin_dir_url( dirname( __FILE__ ) ) . '../woocommerce/assets/js/admin/backbone-modal.min.js', array( 'backbone', 'jquery' ), false, false );
+		wp_enqueue_script( 'wc-orders', plugin_dir_url( dirname( __FILE__ ) ) . '../woocommerce/assets/js/admin/wc-orders.min.js', array( 'underscore', 'backbone', 'wp-util' ), false, false );
 	}
 
 	/**
@@ -302,7 +302,7 @@ class Neoship_Admin {
 				$template = 1;
 				break;
 			case 'neoship_print_stickers_zebra_80x214':
-				$template = 1;
+				$template = 2;
 				break;
 		}
 
