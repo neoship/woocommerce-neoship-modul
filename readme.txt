@@ -33,6 +33,15 @@ Neoship is expedition system.
 
 == Changelog ==
 
+= 1.1 =
+* 1.1 Bug fix release.
+
+== Upgrade Notice ==
+
+= 1.1 =
+Fix print sticker 80x214.
+Fix detail modal in export.
+
 = 1.0 =
 * Initial release.
 
