@@ -370,6 +370,7 @@ class Neoship_Admin {
 						echo esc_html( $output );
 						echo '</p>';
 					}
+
 					echo '</div>';
 				}
 			}
@@ -518,7 +519,7 @@ class Neoship_Admin {
 				if ( 201 === $value['responseCode'] ) {
 					$success[]       = $value;
 					$variable_number = json_decode( $value['responseContent'], true )['variableNumber'];
-					$order           = wc_get_order( $variable_number );
+					$order           = wc_get_order( intval($variable_number) );
 					$order->update_status( 'export-to-neoship', gmdate( 'd-m-Y H:i:s' ) );
 				} else {
 					$failed[] = json_decode( $value['responseContent'] );
