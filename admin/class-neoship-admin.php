@@ -449,6 +449,7 @@ class Neoship_Admin {
 			$states       = $this->api->get_states_ids();
 			$currencies   = $this->api->get_currencies_ids();
 
+			$orderNumberToId = [];
 			$packages = array();
 			foreach ( $_POST['packages'] as $pkg ) {
 				$order      = wc_get_order( intval( $pkg['id'] ) )->get_data();
@@ -470,7 +471,8 @@ class Neoship_Admin {
 				$package['receiver']['email']   = $order['billing']['email'];
 				$package['receiver']['phone']   = $order['billing']['phone'];
 				$package['receiver']['state']   = $states[ $order['shipping']['country'] ];
-				$package['variableNumber']      = $order['id'];
+				$package['variableNumber']      = $order['number'];
+                $orderNumberToId[$order['number']] = $order['id'];
 
 				if ( 'cod' === $order['payment_method'] ) {
 					$package['cashOnDeliveryPrice']    = $order['total'];
@@ -518,7 +520,7 @@ class Neoship_Admin {
 			foreach ( $response as $value ) {
 				$content = json_decode( $value['responseContent'], true );
 				$variable_number = $content['variableNumber'];
-				$order           = wc_get_order( intval($variable_number) );
+				$order           = wc_get_order( intval($orderNumberToId[$variable_number]) );
 				if ( 201 === $value['responseCode'] ) {
 					$success[]       = $value;
 					$order->update_status( 'export-to-neoship', gmdate( 'd-m-Y H:i:s' ) );
