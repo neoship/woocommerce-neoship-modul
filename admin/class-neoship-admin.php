@@ -306,7 +306,13 @@ class Neoship_Admin {
 				break;
 		}
 
-		$this->api->print_sticker( $template, $posts_ids );
+        $reference_numbers = [];
+        foreach ($posts_ids as $post_id){
+            $order = wc_get_order( intval($post_id))->get_data();
+            $reference_numbers[] = $order['number'];
+        }
+
+		$this->api->print_sticker( $template, $reference_numbers );
 
 	}
 
@@ -326,7 +332,13 @@ class Neoship_Admin {
 			return $redirect_to;
 		}
 
-		$this->api->print_acceptance_protocol( $posts_ids );
+        $reference_numbers = [];
+        foreach ($posts_ids as $post_id){
+            $order = wc_get_order( intval($post_id))->get_data();
+            $reference_numbers[] = $order['number'];
+        }
+
+		$this->api->print_acceptance_protocol( $reference_numbers );
 
 	}
 
@@ -426,9 +438,9 @@ class Neoship_Admin {
 	 */
 	public function add_neoship_order_list_actions( $actions, $order ) {
 		if ( $order->has_status( array( 'export-to-neoship' ) ) ) {
-			$order_id                     = method_exists( $order, 'get_id' ) ? $order->get_id() : $order->id;
+			$order_number                     = method_exists( $order, 'get_order_number' ) ? $order->get_order_number() : $order->get_data()['number'];
 			$actions['export-to-neoship'] = array(
-				'url'    => NEOSHIP_TRACKING_URL . '/tracking/packageReference/' . $this->settings['userid'] . '/' . $order_id,
+				'url'    => NEOSHIP_TRACKING_URL . '/tracking/packageReference/' . $this->settings['userid'] . '/' . $order_number,
 				'name'   => __( 'Tracking', 'neoship' ),
 				'action' => 'export-to-neoship',
 			);
@@ -449,7 +461,7 @@ class Neoship_Admin {
 			$states       = $this->api->get_states_ids();
 			$currencies   = $this->api->get_currencies_ids();
 
-			$orderNumberToId = [];
+			$order_number_to_id = [];
 			$packages = array();
 			foreach ( $_POST['packages'] as $pkg ) {
 				$order      = wc_get_order( intval( $pkg['id'] ) )->get_data();
@@ -472,7 +484,7 @@ class Neoship_Admin {
 				$package['receiver']['phone']   = $order['billing']['phone'];
 				$package['receiver']['state']   = $states[ $order['shipping']['country'] ];
 				$package['variableNumber']      = $order['number'];
-                $orderNumberToId[$order['number']] = $order['id'];
+                $order_number_to_id[$order['number']] = $order['id'];
 
 				if ( 'cod' === $order['payment_method'] ) {
 					$package['cashOnDeliveryPrice']    = $order['total'];
@@ -520,13 +532,13 @@ class Neoship_Admin {
 			foreach ( $response as $value ) {
 				$content = json_decode( $value['responseContent'], true );
 				$variable_number = $content['variableNumber'];
-				$order           = wc_get_order( intval($orderNumberToId[$variable_number]) );
+				$order           = wc_get_order( intval($order_number_to_id[$variable_number]) );
 				if ( 201 === $value['responseCode'] ) {
 					$success[]       = $value;
 					$order->update_status( 'export-to-neoship', gmdate( 'd-m-Y H:i:s' ) );
 				} else {
 					$failed[] = [
-						'variableNumber' => $order->data['number'],
+						'variableNumber' => method_exists( $order, 'get_order_number' ) ? $order->get_order_number() : $order->get_data()['number'],
 						'result' 		 => $content['result'],
 					];
 				}
@@ -583,7 +595,7 @@ class Neoship_Admin {
 									<tr>
 										<td scope="col" class="manage-column">
 											<input type="hidden" name="packages[<?php echo esc_html( $index ); ?>][id]" value="<?php echo esc_html( $order['id'] ); ?>">
-											<a href="#" class="order-preview" data-order-id="<?php echo esc_html( $order['id'] ); ?>"><strong><?php echo esc_html( '#' . $order['id'] . ' ' . $order['billing']['first_name'] . ' ' . $order['billing']['last_name'] ); ?></strong></a>
+											<a href="#" class="order-preview" data-order-id="<?php echo esc_html( $order['id'] ); ?>"><strong><?php echo esc_html( '#' . $order['number'] . ' ' . $order['billing']['first_name'] . ' ' . $order['billing']['last_name'] ); ?></strong></a>
 										</td>
 										<td scope="col" class="manage-column">
 											<input type="checkbox" name="packages[<?php echo esc_html( $index ); ?>][sms]" value="1" checked>
