@@ -183,7 +183,7 @@ class Neoship_Public {
 	 * @param int $order_id Id of order.
 	 */
 	public function update_carriers( $order_id ) {
-		if ( isset( $_POST['parcelshop_id'] ) && false !== wp_verify_nonce( wp_unslash( $sanitized_id ) ) ) {
+		if ( isset( $_POST['parcelshop_id'] ) ) {
 			$sanitized_id = intval( $_POST['parcelshop_id'] );
 			update_post_meta( $order_id, '_parcelshop_id', $sanitized_id );
 		}
