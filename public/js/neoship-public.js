@@ -11,6 +11,7 @@
 		function () {
 			if (typeof $('.test').select2 === "function") {
 				$( '#parcelshop_id' ).select2();
+				$( '#glsparcelshop_id' ).select2();
 			}
 		}
 	);
@@ -20,6 +21,7 @@
 		function () {
 			if (typeof $('.test').select2 === "function") {
 				$( '#parcelshop_id' ).select2();
+				$( '#glsparcelshop_id' ).select2();
 			}
 		}
 	);

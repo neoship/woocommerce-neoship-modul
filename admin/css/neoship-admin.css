@@ -21,6 +21,6 @@
 	color: white;
 }
 
-.widefat .column-wc_actions .export-to-neoship::after{
+.widefat .column-wc_actions .neoship-tracking::after{
 	content: "\f319";
 }
