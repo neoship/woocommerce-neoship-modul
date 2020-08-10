@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Neoship 2.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/neoship\n"
-"POT-Creation-Date: 2020-07-17 12:17+0200\n"
-"PO-Revision-Date: 2020-07-17 12:18+0200\n"
+"POT-Creation-Date: 2020-08-10 09:12+0200\n"
+"PO-Revision-Date: 2020-08-10 09:14+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sk_SK\n"
@@ -15,63 +15,72 @@ msgstr ""
 "X-Generator: Poedit 2.3.1\n"
 "X-Domain: neoship\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n >= 2 && n <= 4 ? 1 : 2;\n"
-"X-Poedit-KeywordsList: __;_e;esc_html_e;_n;_n_noop;_n:1,2\n"
+"X-Poedit-KeywordsList: __;_e;esc_html_e;_n;_n_noop;_n:1,2;esc_html__\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: admin/class-neoship-admin.php:144
+#: admin/class-neoship-admin.php:154
 msgid "Neoship settings"
 msgstr "Nastavenie prihlásenia"
 
-#: admin/class-neoship-admin.php:144
+#: admin/class-neoship-admin.php:154
 msgid "Neoship"
 msgstr ""
 
-#: admin/class-neoship-admin.php:148
+#: admin/class-neoship-admin.php:158
 msgid "Neoship export"
 msgstr ""
 
-#: admin/class-neoship-admin.php:168
+#: admin/class-neoship-admin.php:178
 msgid "Login settings"
 msgstr "Nastavenia prihlásenia"
 
-#: admin/class-neoship-admin.php:175
+#: admin/class-neoship-admin.php:185
 msgid "Client ID"
 msgstr ""
 
-#: admin/class-neoship-admin.php:183
+#: admin/class-neoship-admin.php:193
 msgid "Client secret"
 msgstr ""
 
-#: admin/class-neoship-admin.php:198
+#: admin/class-neoship-admin.php:208
 msgid "Please fill data which you receive from neoship"
 msgstr "Prosím, vyplnte dáta, ktoré ste dostali od Neoshipu"
 
-#: admin/class-neoship-admin.php:256
+#: admin/class-neoship-admin.php:266
 msgid "Export to Neoship"
 msgstr "Exportovať do Neoshipu"
 
-#: admin/class-neoship-admin.php:257
+#: admin/class-neoship-admin.php:267
 msgid "Print stickers (PDF)"
 msgstr "Tlač štítkov (PDF)"
 
-#: admin/class-neoship-admin.php:258
+#: admin/class-neoship-admin.php:268
 msgid "Print zebra stickers(PDF) 102x152"
 msgstr "Tlač Zebra štítkov (PDF) 102x152"
 
-#: admin/class-neoship-admin.php:259
+#: admin/class-neoship-admin.php:269
 msgid "Print zebra stickers (PDF) 80x214"
 msgstr "Tlač Zebra štítkov (PDF) 80x214"
 
-#: admin/class-neoship-admin.php:260
+#: admin/class-neoship-admin.php:270
 msgid "Acceptance protocol"
 msgstr "Preberací protokol"
 
-#: admin/class-neoship-admin.php:263
-msgid "Print stickers Gls (PDF)"
-msgstr "Tlač štítkov Gls (PDF)"
+#: admin/class-neoship-admin.php:273
+msgid "GLS Send data to shipper and print stickers (PDF)"
+msgstr "GLS Odoslať dáta prepravcovi a vytlačiť štítky (PDF)"
 
-#: admin/class-neoship-admin.php:372
+#: admin/class-neoship-admin.php:415
+#, php-format
+msgid "Order %s"
+msgstr "Objednávka %s"
+
+#: admin/class-neoship-admin.php:428
+msgid "Download generated stickers again"
+msgstr "Opätovne stiahnuť vygenerované štítky"
+
+#: admin/class-neoship-admin.php:447
 #, php-format
 msgid "%d order was exported"
 msgid_plural "%d orders was exported"
@@ -79,7 +88,7 @@ msgstr[0] "%d objednávka bola exportovaná"
 msgstr[1] "%d objednávky boli exportované"
 msgstr[2] "%d objednávok bolo exportovaných"
 
-#: admin/class-neoship-admin.php:377 admin/class-neoship-admin.php:386
+#: admin/class-neoship-admin.php:452 admin/class-neoship-admin.php:461
 #, php-format
 msgid "%d order was not exported"
 msgid_plural "%d orders was not exported"
@@ -87,74 +96,79 @@ msgstr[0] "%d objednávka nebola exportovaná"
 msgstr[1] "%d objednávky neboli exportované"
 msgstr[2] "%d objednávok nebolo exportovaných"
 
-#: admin/class-neoship-admin.php:418 admin/class-neoship-admin.php:437
+#: admin/class-neoship-admin.php:467
+#, php-format
+msgid "Order %d"
+msgstr "Objednávka %d"
+
+#: admin/class-neoship-admin.php:493 admin/class-neoship-admin.php:512
 msgid "Exported to Neoship"
 msgstr "Exportovaná do neoshipu"
 
-#: admin/class-neoship-admin.php:423
+#: admin/class-neoship-admin.php:498
 #, php-format
 msgid "Exported to Neoship <span class=\"count\">(%s)</span>"
 msgstr "Exportovaná do Neoshipu <span class=\"count\">(%s)</span>"
 
-#: admin/class-neoship-admin.php:455
+#: admin/class-neoship-admin.php:535
 msgid "Tracking"
 msgstr ""
 
-#: admin/class-neoship-admin.php:622
+#: admin/class-neoship-admin.php:701
 msgid "Export orders to neoship"
 msgstr "Exportovať objednávky do Neoshipu"
 
-#: admin/class-neoship-admin.php:658
+#: admin/class-neoship-admin.php:737
 msgid "Send SMS"
 msgstr "Poslať SMS"
 
-#: admin/class-neoship-admin.php:661
+#: admin/class-neoship-admin.php:740
 msgid "Send email"
 msgstr "Poslať email"
 
-#: admin/class-neoship-admin.php:668
+#: admin/class-neoship-admin.php:748
 msgid "Hold delivery"
 msgstr "Pozdržať expedovanie"
 
-#: admin/class-neoship-admin.php:672
+#: admin/class-neoship-admin.php:751
 msgid "Saturday delivery"
 msgstr "Sobotné dodanie"
 
-#: admin/class-neoship-admin.php:677
+#: admin/class-neoship-admin.php:756
 msgid "Amount of packages"
 msgstr "Počet balíkov"
 
-#: admin/class-neoship-admin.php:684
+#: admin/class-neoship-admin.php:763
 #, fuzzy
 #| msgid "Amount of packages"
 msgid "Amount of COD"
 msgstr "Počet balíkov"
 
-#: admin/class-neoship-admin.php:688
+#: admin/class-neoship-admin.php:767
 msgid "Amount of insurance"
 msgstr "Výška poistenia"
 
-#: admin/class-neoship-admin.php:693
+#: admin/class-neoship-admin.php:772
 msgid "Delivery type"
 msgstr "Typ dodania"
 
-#: admin/class-neoship-admin.php:695
+#: admin/class-neoship-admin.php:774
 msgid "Standard delivery"
 msgstr "Štandardné doručenie"
 
-#: admin/class-neoship-admin.php:696
+#: admin/class-neoship-admin.php:775
 msgid "Express to 12:00"
 msgstr "Expres do 12:00"
 
-#: admin/class-neoship-admin.php:697
+#: admin/class-neoship-admin.php:776
 msgid "Express to 9:00"
 msgstr "Expres do 9:00"
 
-#: admin/class-neoship-admin.php:709
+#: admin/class-neoship-admin.php:788
 msgid "Back"
 msgstr ""
 
-#: admin/class-neoship-admin.php:710
+#: admin/class-neoship-admin.php:789
 msgid "Export"
 msgstr "Exportovať"
 
@@ -174,12 +188,12 @@ msgstr "Prihlasovacie údaje sú správne"
 
 #: includes/class-neoship-api.php:92 includes/class-neoship-api.php:119
 #: includes/class-neoship-api.php:171 includes/class-neoship-api.php:203
-#: includes/class-neoship-api.php:224 includes/class-neoship-api.php:363
-#: includes/class-neoship-api.php:392
+#: includes/class-neoship-api.php:224 includes/class-neoship-api.php:385
+#: includes/class-neoship-api.php:414
 msgid "Something is wrong. Please refresh the page and try again"
 msgstr "Niečo je zle. Prosím, obnovte stránku"
 
-#: includes/class-neoship-api.php:335
+#: includes/class-neoship-api.php:357
 msgid ""
 "You are trying Neoship action on orders which are not imported to neoship"
 msgstr ""
@@ -257,6 +271,9 @@ msgstr "Prosím vyplnte parcelshop"
 #: public/class-neoship-public.php:193 public/class-neoship-public.php:203
 msgid "Choose correct parcelshop"
 msgstr "Vyberte správny parcelshop"
+
+#~ msgid "Print stickers Gls (PDF)"
+#~ msgstr "Tlač štítkov Gls (PDF)"
 
 #~ msgid "neoship"
 #~ msgstr "Neoship"

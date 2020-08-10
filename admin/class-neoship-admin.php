@@ -270,7 +270,7 @@ class Neoship_Admin {
 		$actions['neoship_acceptance_protocol']          = __( 'Acceptance protocol', 'neoship' );
 		
 		if ( get_option( 'neoship_has_gls' ) ) {
-			$actions['neoship_print_stickers_gls'] = __( 'Print stickers Gls (PDF)', 'neoship' );
+			$actions['neoship_print_stickers_gls'] = __( 'GLS Send data to shipper and print stickers (PDF)', 'neoship' );
 		}
 
 		return $actions;
@@ -334,7 +334,19 @@ class Neoship_Admin {
 		}
 
 		if ( $action === 'neoship_print_stickers_gls' ) {
-			$this->api->print_sticker_gls( $reference_numbers );
+
+			$location = add_query_arg(
+				array(
+					'neoship_print_sticker_export' => 1,
+					'reference_numbers' 		   => $reference_numbers,
+					'_wpnonce'       			   => wp_create_nonce( 'neoship_notice_nonce' ),
+				),
+				admin_url( 'edit.php?post_type=shop_order' )
+			);
+
+			wp_safe_redirect( ( $location ) );
+			exit();
+
 		} else {
 			$this->api->print_sticker( $template, $reference_numbers );
 		}
@@ -374,6 +386,42 @@ class Neoship_Admin {
 	 * @access public
 	 */
 	public function neoship_bulk_action_admin_notice() {
+		
+		if ( ! empty( $_REQUEST['neoship_print_sticker_export'] ) && ! empty( $_REQUEST['_wpnonce'] ) ) {
+			if ( false !== wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'neoship_notice_nonce' ) ) {
+				
+				$labels_errors = $this->api->print_sticker_gls( $_REQUEST['reference_numbers'] );
+
+				if ( count( $labels_errors['errors'] ) > 0 ) {
+					echo '<div class="notice notice-error is-dismissible"><p>';
+					foreach ( $labels_errors['errors'] as $key => $value ) {
+						echo '<p>';
+						echo '<strong>';
+						printf(  esc_html__( 'Order %s', 'neoship' ), $key );
+						echo '</strong>: ' . esc_html( implode( ', ', $value ) );
+						echo '</p>';
+					}
+					echo '</div>';
+				}
+
+				if ( $labels_errors['labels'] !== '' ) {
+					echo '<div class="notice notice-success is-dismissible"><p id="neoship_download_sticker_link" >';
+					echo 
+					'<script>
+						var link = document.createElement("a");
+						link.classList.add("button");
+						link.classList.add("action");
+						link.innerHTML = "<strong>' . __( 'Download generated stickers again' ) . '</strong>";
+						link.download = "stickers.pdf";
+						link.href = "data:application/pdf;base64,' . $labels_errors['labels'] . '";
+						link.click();
+						document.getElementById("neoship_download_sticker_link").appendChild(link);
+					</script>';
+					echo '</p></div>';
+				}
+			}
+		}
+
 		if ( ! empty( $_REQUEST['neoship_export'] ) && ! empty( $_REQUEST['_wpnonce'] ) ) {
 
 			if ( false !== wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'neoship_notice_nonce' ) ) {
@@ -507,7 +555,7 @@ class Neoship_Admin {
 				$package['sender']              = $user_address;
 				$package['receiver']            = array();
 				$package['receiver']['name']    = $order['shipping']['first_name'] . ' ' . $order['shipping']['last_name'];
-				if ( !$is_gls_package ) {
+				if ( ! $is_gls_package ) {
 					$package['receiver']['company'] = $order['shipping']['company'];
 				}
 				$package['receiver']['street']  = $order['shipping']['address_1'];
@@ -521,23 +569,25 @@ class Neoship_Admin {
 
 				if ( 'cod' === $order['payment_method'] ) {
 					$package['cashOnDeliveryPrice'] = sanitize_text_field( $pkg['cod'] );
-					if (!$is_gls_package) {
+					if ( ! $is_gls_package ) {
 						$package['cashOnDeliveryCurrency'] = $currencies[ $order['currency'] ];
 					}
 				} else {
 					$package['cashOnDeliveryPrice'] = '';
-					if (!$is_gls_package) {
+					if (! $is_gls_package) {
 						$package['cashOnDeliveryCurrency'] = '';
 					}
 				}
 
 				$package['insurance'] = sanitize_text_field( $pkg['insurance'] );
 
-				if ( isset( $pkg['holddelivery'] ) ) {
-					$package['holdDelivery'] = true;
-				}
+				
+				if ( ! $is_gls_package ) {
+					
+					if ( isset( $pkg['holddelivery'] ) ) {
+						$package['holdDelivery'] = true;
+					}
 
-				if (!$is_gls_package) {
 					$package['cashOnDeliveryPayment'] = '';
 					$package['insuranceCurrency'] = $currencies['EUR'];
 
@@ -655,7 +705,7 @@ class Neoship_Admin {
 
 				?>
 									<tr>
-				<?php if ( !$is_gls_package ) { ?>
+				<?php if ( ! $is_gls_package ) { ?>
 										<td class="check-column">
 											<img src="<?php echo plugins_url( '/../assets/images/sps-logo.png', __FILE__ ) ?>" alt="sps-logo">
 										</td>
@@ -668,7 +718,7 @@ class Neoship_Admin {
 											<input type="hidden" name="packages[<?php echo esc_html( $index ); ?>][id]" value="<?php echo esc_html( $order['id'] ); ?>">
 											<a href="#" class="order-preview" data-order-id="<?php echo esc_html( $order['id'] ); ?>"><strong><?php echo esc_html( '#' . $order['number'] . ' ' . $order['billing']['first_name'] . ' ' . $order['billing']['last_name'] ); ?></strong></a>
 										</td>
-				<?php if ( !$is_gls_package ) { ?>
+				<?php if ( ! $is_gls_package ) { ?>
 										<td scope="col" class="manage-column">
 											<input type="checkbox" name="packages[<?php echo esc_html( $index ); ?>][sms]" value="1" checked>
 											<label for="packages[<?php echo esc_html( $index ); ?>][sms]"><?php esc_html_e( 'Send SMS', 'neoship' ); ?></label>
@@ -680,10 +730,10 @@ class Neoship_Admin {
 										<td></td>
 				<?php } ?>
 										<td scope="col" class="manage-column">
+				<?php if ( ! $is_gls_package ) { ?>
 											<input type="checkbox" name="packages[<?php echo esc_html( $index ); ?>][holddelivery]" value="1">
 											<label for="packages[<?php echo esc_html( $index ); ?>][holddelivery]"><?php esc_html_e( 'Hold delivery', 'neoship' ); ?></label>
 											<br>
-				<?php if ( !$is_gls_package ) { ?>
 											<input type="checkbox" name="packages[<?php echo esc_html( $index ); ?>][saturdaydelivery]" value="1">
 											<label for="packages[<?php echo esc_html( $index ); ?>][saturdaydelivery]"><?php esc_html_e( 'Saturday delivery', 'neoship' ); ?></label>
 				<?php } ?>
@@ -704,7 +754,7 @@ class Neoship_Admin {
 											<label for="packages[<?php echo esc_html( $index ); ?>][insurance]"><?php esc_html_e( 'Amount of insurance', 'neoship' ); ?> (€)</label><br>
 											<input type="number" step="0.01" name="packages[<?php echo esc_html( $index ); ?>][insurance]" value="0">
 										</td>
-				<?php if ( !$is_gls_package ) { ?>
+				<?php if ( ! $is_gls_package ) { ?>
 										<td scope="col" class="manage-column">
 											<label for="packages[<?php echo esc_html( $index ); ?>][deliverytype]"><?php esc_html_e( 'Delivery type', 'neoship' ); ?></label><br>
 											<select name="packages[<?php echo esc_html( $index ); ?>][deliverytype]">
