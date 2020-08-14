@@ -286,10 +286,10 @@ class Neoship_Api {
 			$this->login();
 		}
 
-		$data['ref'] = $reference_number;
-		$data        = (object) array_merge( (array) $data, (array) $this->access_data );
-		$url         = NEOSHIP_API_URL . '/package/stickerwitherrors?' . http_build_query( $data );
-		$response    = wp_remote_get( $url );
+		$data['ref']    = $reference_number;
+		$data           = (object) array_merge( (array) $data, (array) $this->access_data );
+		$url            = NEOSHIP_API_URL . '/package/stickerwitherrors?' . http_build_query( $data );
+		$response       = wp_remote_get( $url );
 		$labels_errors  = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		return $labels_errors;

@@ -392,19 +392,26 @@ class Neoship_Admin {
 				
 				$labels_errors = $this->api->print_sticker_gls( $_REQUEST['reference_numbers'] );
 
+				$labels_errors = isset( $labels_errors[ 'message' ] ) ? [
+					'errors' => [
+						$labels_errors[ 'message' ]
+					]
+				] : $labels_errors;
+
 				if ( count( $labels_errors['errors'] ) > 0 ) {
 					echo '<div class="notice notice-error is-dismissible"><p>';
 					foreach ( $labels_errors['errors'] as $key => $value ) {
+						$value = is_array( $value ) ? implode( ', ', $value) : $value;
 						echo '<p>';
 						echo '<strong>';
 						printf(  esc_html__( 'Order %s', 'neoship' ), $key );
-						echo '</strong>: ' . esc_html( implode( ', ', $value ) );
+						echo '</strong>: ' . esc_html( $value );
 						echo '</p>';
 					}
 					echo '</div>';
 				}
 
-				if ( $labels_errors['labels'] !== '' ) {
+				if ( $labels_errors['labels'] != '' ) {
 					echo '<div class="notice notice-success is-dismissible"><p id="neoship_download_sticker_link" >';
 					echo 
 					'<script>
@@ -620,7 +627,6 @@ class Neoship_Admin {
 						$package['parcelshopId'] = $glsparcelshop;
 					} else {
 						$package['countOfPackages'] = intval( $pkg['amount'] );
-						unset( $package['sender']['company'] );
 					}
 
 					unset( $package['sender']['company'] );
