@@ -9,7 +9,7 @@
 
 	$( document ).ready(
 		function () {
-			$( 'a.export-to-neoship' ).attr( 'target', '_blank' );
+			$( 'a.neoship-tracking' ).attr( 'target', '_blank' );
 		}
 	);
 

@@ -73,6 +73,11 @@ Fill the form on [https://info.neoship.sk/sk/kontakt](https://info.neoship.sk/sk
 = 1.1.5 =
 * Fixed parcelshop export.
 
+= 2.0.0 =
+* Add GLS support.
+* Add icons to export page.
+* Fix loading assets on plugin page.
+
 == Upgrade Notice ==
 
 = 1.0 =

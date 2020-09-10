@@ -96,6 +96,9 @@ class Neoship_Api {
 
 		$this->login_data['userid'] = $user['id'];
 		update_option( 'neoship_login', $this->login_data );
+		if ( isset( $user['hasGls'] ) ) {
+			update_option( 'neoship_has_gls', $user['hasGls'] );
+		}
 	}
 
 	/**
@@ -184,12 +187,12 @@ class Neoship_Api {
 	 *
 	 * @param array $packages Array of packages details.
 	 */
-	public function create_packages( $packages ) {
+	public function create_packages( $packages, $gls = false ) {
 		if ( false === $this->access_data ) {
 			$this->login();
 		}
 
-		$url  = NEOSHIP_API_URL . '/package/bulk?' . http_build_query( $this->access_data );
+		$url  = NEOSHIP_API_URL . '/package/bulk?' . ($gls ? 'gls=1&' : '') . http_build_query( $this->access_data );
 		$args = array(
 			'body' => $packages,
 		);
@@ -268,6 +271,28 @@ class Neoship_Api {
 		if ( $exit ) {
 			exit();
 		}
+	}
+
+	/**
+	 * Handle sticker print for Gls.
+	 *
+	 * @since  2.0.0
+	 * @access public
+	 *
+	 * @param string $reference_number Package reference number.
+	 */
+	public function print_sticker_gls( $reference_number ) {
+		if ( false === $this->access_data ) {
+			$this->login();
+		}
+
+		$data['ref']    = $reference_number;
+		$data           = (object) array_merge( (array) $data, (array) $this->access_data );
+		$url            = NEOSHIP_API_URL . '/package/stickerwitherrors?' . http_build_query( $data );
+		$response       = wp_remote_get( $url );
+		$labels_errors  = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		return $labels_errors;
 	}
 
 	/**
@@ -368,6 +393,35 @@ class Neoship_Api {
 				$return_parcel[ $parcelshop['id'] ] = $parcelshop;
 			} else {
 				$return_parcel[ $parcelshop['id'] ] = $parcelshop['address']['city'] . ', ' . $parcelshop['address']['company'];
+			}
+		}
+		return $return_parcel;
+	}
+
+	/**
+	 * Get gls parcelshops.
+	 *
+	 * @since  2.0.0
+	 * @access public
+	 *
+	 * @param bool $all Get all data.
+	 */
+	public function get_gls_parcel_shops( $all = false ) {
+		$url      = NEOSHIP_API_URL . '/public/glsparcelshop/';
+		$response = wp_remote_get( $url );
+
+		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			$this->error_message( __( 'Something is wrong. Please refresh the page and try again', 'neoship' ) );
+		}
+
+		$parcel_shops = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		$return_parcel = array();
+		foreach ( $parcel_shops as $parcelshop ) {
+			if ( $all ) {
+				$return_parcel[ $parcelshop['parcelShopId'] ] = $parcelshop;
+			} else {
+				$return_parcel[ $parcelshop['parcelShopId'] ] = $parcelshop['cityName'] . ', ' . $parcelshop['name'];
 			}
 		}
 		return $return_parcel;
