@@ -626,7 +626,7 @@ class Neoship_Admin {
 					if ( $glsparcelshop ) {
 						$package['parcelshopId'] = $glsparcelshop;
 					} else {
-						$package['countOfPackages'] = intval( $pkg['amount'] );
+						$package['countOfPackages'] = 1;
 					}
 
 					unset( $package['sender']['company'] );
@@ -745,10 +745,10 @@ class Neoship_Admin {
 				<?php } ?>
 										</td>
 										<td scope="col" class="manage-column">
-				<?php if ( '' === $parcelshop_id && '' === $glsparcelshop_id ) { ?>
+				<?php if ( '' === $parcelshop_id && ! $is_gls_package ) { ?>
 												<label for="packages[<?php echo esc_html( $index ); ?>][amount]"><?php esc_html_e( 'Amount of packages', 'neoship' ); ?></label><br>
 												<input type="number" min="1" step="1" name="packages[<?php echo esc_html( $index ); ?>][amount]" value="1">
-				<?php } else { ?>
+				<?php } elseif ( '' !== $parcelshop_id || '' !== $glsparcelshop_id ) { ?>
 												<strong>Parcelshop</strong>
 				<?php } ?>
 										</td>
