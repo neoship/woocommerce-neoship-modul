@@ -713,11 +713,11 @@ class Neoship_Admin {
 									<tr>
 				<?php if ( ! $is_gls_package ) { ?>
 										<td class="check-column">
-											<img src="<?php echo plugins_url( '/../assets/images/sps-logo.png', __FILE__ ) ?>" alt="sps-logo">
+											<img src="<?php echo plugins_url( '/../public/images/sps-logo.png', __FILE__ ) ?>" alt="sps-logo">
 										</td>
 				<?php } else { ?>
 										<td class="check-column">
-											<img src="<?php echo plugins_url( '/../assets/images/gls-logo.png', __FILE__ ) ?>" alt="sps-logo">
+											<img src="<?php echo plugins_url( '/../public/images/gls-logo.png', __FILE__ ) ?>" alt="sps-logo">
 										</td>
 				<?php } ?>
 										<td scope="col" class="manage-column">
