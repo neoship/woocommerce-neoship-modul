@@ -574,7 +574,7 @@ class Neoship_Admin {
 				$package['variableNumber']      = $order['number'];
                 $order_number_to_id[$order['number']] = $order['id'];
 
-				if ( 'cod' === $order['payment_method'] ) {
+				if ( in_array( $order['payment_method'], [ 'cod', 'dobirka' ] ) ) {
 					$package['cashOnDeliveryPrice'] = sanitize_text_field( $pkg['cod'] );
 					if ( ! $is_gls_package ) {
 						$package['cashOnDeliveryCurrency'] = $currencies[ $order['currency'] ];
@@ -754,7 +754,7 @@ class Neoship_Admin {
 										</td>
 										<td scope="col" class="manage-column">
 											<label for="packages[<?php echo esc_html( $index ); ?>][cod]"><?php esc_html_e( 'Amount of COD', 'neoship' ); ?></label><br>
-											<input type="number" step="0.01" name="packages[<?php echo esc_html( $index ); ?>][cod]" value="<?php echo 'cod' === $order['payment_method'] ? $order['total'] : 0 ?>">
+											<input type="number" step="0.01" name="packages[<?php echo esc_html( $index ); ?>][cod]" value="<?php echo in_array( $order['payment_method'], [ 'cod', 'dobirka' ] ) ? $order['total'] : 0 ?>">
 										</td>
 										<td scope="col" class="manage-column">
 											<label for="packages[<?php echo esc_html( $index ); ?>][insurance]"><?php esc_html_e( 'Amount of insurance', 'neoship' ); ?> (€)</label><br>

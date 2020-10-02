@@ -15,7 +15,7 @@
  * Plugin Name:       Neoship
  * Plugin URI:        neoship
  * Description:       Export orders to neoship
- * Version:           2.0.1
+ * Version:           2.0.2
  * Author:            Neoship
  * Author URI:        https://www.kuskosoft.com
  * License:           GPL-2.0+
@@ -24,7 +24,7 @@
  * Domain Path:       /languages
  *
  * WC requires at least: 3.3
- * WC tested up to: 3.8.1
+ * WC tested up to: 4.5
  *
  * Copyright: © 2009-2015 WooCommerce.
  * License: GNU General Public License v3.0

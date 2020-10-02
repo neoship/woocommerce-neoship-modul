@@ -3,8 +3,8 @@ Contributors: neoship
 Donate link: https://neoship.sk/
 Tags: neoship, shipping
 Requires at least: 4.9
-Tested up to: 5.3
-Stable tag: 2.0.1
+Tested up to: 5.5
+Stable tag: 2.0.2
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -80,6 +80,9 @@ Fill the form on [https://info.neoship.sk/sk/kontakt](https://info.neoship.sk/sk
 
 = 2.0.1 =
 * Fix showing carrier icons
+
+= 2.0.2 =
+* Add support COD "dobirka"
 
 == Upgrade Notice ==
 
