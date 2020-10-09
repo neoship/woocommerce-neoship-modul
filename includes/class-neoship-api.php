@@ -280,17 +280,19 @@ class Neoship_Api {
 	 * @access public
 	 *
 	 * @param string $reference_number Package reference number.
+	 * @param string $position Sticker position on A4 paper.
 	 */
-	public function print_sticker_gls( $reference_number ) {
+	public function print_sticker_gls( $reference_number, $position = 1 ) {
 		if ( false === $this->access_data ) {
 			$this->login();
 		}
 
-		$data['ref']    = $reference_number;
-		$data           = (object) array_merge( (array) $data, (array) $this->access_data );
-		$url            = NEOSHIP_API_URL . '/package/stickerwitherrors?' . http_build_query( $data );
-		$response       = wp_remote_get( $url );
-		$labels_errors  = json_decode( wp_remote_retrieve_body( $response ), true );
+		$data['ref']    			  = $reference_number;
+		$data['firstStickerPosition'] = $position;
+		$data           			  = (object) array_merge( (array) $data, (array) $this->access_data );
+		$url            			  = NEOSHIP_API_URL . '/package/stickerwitherrors?' . http_build_query( $data );
+		$response       			  = wp_remote_get( $url );
+		$labels_errors  			  = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		return $labels_errors;
 	}
@@ -303,15 +305,17 @@ class Neoship_Api {
 	 *
 	 * @param string $template Which sticker print.
 	 * @param string $reference_number Package reference number.
+	 * @param string $position Sticker position on A4 paper.
 	 */
-	public function print_sticker( $template, $reference_number ) {
+	public function print_sticker( $template, $reference_number, $position = 1 ) {
 		if ( false === $this->access_data ) {
 			$this->login();
 		}
 
-		$data['ref']      = $reference_number;
-		$data['template'] = $template;
-		$data             = (object) array_merge( (array) $data, (array) $this->access_data );
+		$data['ref']      			   = $reference_number;
+		$data['firstStickerPosition'] = $position;
+		$data['template'] 			   = $template;
+		$data             			   = (object) array_merge( (array) $data, (array) $this->access_data );
 
 		$url      = NEOSHIP_API_URL . '/package/sticker?' . http_build_query( $data );
 		$response = wp_remote_get( $url );

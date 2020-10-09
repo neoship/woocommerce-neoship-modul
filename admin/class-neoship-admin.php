@@ -110,9 +110,11 @@ class Neoship_Admin {
 		 */
 
 		$screen = get_current_screen();
+
 		if ( 'admin_page_neoship-export' === $screen->id ) {
 			wp_enqueue_style( 'woocommerce_stylesheet', plugin_dir_url( dirname( __FILE__ ) ) . '../woocommerce/assets/css/admin.css', array(), '3.8.1', 'all' );
 		}
+
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/neoship-admin.css', array(), $this->version, 'all' );
 
 	}
@@ -141,6 +143,11 @@ class Neoship_Admin {
 			wp_enqueue_script( 'wc-backbone-modal', plugin_dir_url( dirname( __FILE__ ) ) . '../woocommerce/assets/js/admin/backbone-modal.min.js', array( 'backbone', 'jquery' ), false, false );
 			wp_enqueue_script( 'wc-orders', plugin_dir_url( dirname( __FILE__ ) ) . '../woocommerce/assets/js/admin/wc-orders.min.js', array( 'underscore', 'backbone', 'wp-util' ), false, false );
 		}
+
+		if ( 'edit-shop_order' === $screen->id ) {
+			wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/neoship-sticker-position.js', array(), $this->version, false );
+		}
+
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/neoship-admin.js', array( 'jquery' ), $this->version, false );
 	}
 
@@ -312,8 +319,22 @@ class Neoship_Admin {
 	 * @param array  $posts_ids Posts ids.
 	 */
 	public function handle_bulk_action_print_stickers( $redirect_to, $action, $posts_ids ) {
+		$allowed_values = array(
+			'neoship_print_stickers_gls', 
+			'neoship_print_stickers_gls_position_1', 
+			'neoship_print_stickers_gls_position_2', 
+			'neoship_print_stickers_gls_position_3', 
+			'neoship_print_stickers_gls_position_4', 
+			'neoship_print_stickers', 
+			'neoship_print_stickers_position_1', 
+			'neoship_print_stickers_position_2', 
+			'neoship_print_stickers_position_3', 
+			'neoship_print_stickers_position_4', 
+			'neoship_print_stickers_zebra_102x152', 
+			'neoship_print_stickers_zebra_80x214'
+		);
 
-		if ( ! in_array( $action, array( 'neoship_print_stickers_gls', 'neoship_print_stickers', 'neoship_print_stickers_zebra_102x152', 'neoship_print_stickers_zebra_80x214' ), true ) ) {
+		if ( ! in_array( $action, $allowed_values, true ) ) {
 			return $redirect_to;
 		}
 
@@ -333,12 +354,15 @@ class Neoship_Admin {
             $reference_numbers[] = $order['number'];
 		}
 
-		if ( $action === 'neoship_print_stickers_gls' ) {
+		if ( strpos( $action, 'neoship_print_stickers_gls' ) !== false ) {
+			$sticker_position = str_replace( 'neoship_print_stickers_gls_position_', '', $action );
+			$sticker_position = $sticker_position !== '' ? $sticker_position : '1';
 
 			$location = add_query_arg(
 				array(
 					'neoship_print_sticker_export' => 1,
 					'reference_numbers' 		   => $reference_numbers,
+					'position' 		   			   => $sticker_position,
 					'_wpnonce'       			   => wp_create_nonce( 'neoship_notice_nonce' ),
 				),
 				admin_url( 'edit.php?post_type=shop_order' )
@@ -348,7 +372,9 @@ class Neoship_Admin {
 			exit();
 
 		} else {
-			$this->api->print_sticker( $template, $reference_numbers );
+			$sticker_position = str_replace( 'neoship_print_stickers_position_', '', $action );
+			$sticker_position = $sticker_position !== '' ? $sticker_position : '1';
+			$this->api->print_sticker( $template, $reference_numbers, $sticker_position );
 		}
 
 	}
@@ -390,7 +416,7 @@ class Neoship_Admin {
 		if ( ! empty( $_REQUEST['neoship_print_sticker_export'] ) && ! empty( $_REQUEST['_wpnonce'] ) ) {
 			if ( false !== wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'neoship_notice_nonce' ) ) {
 				
-				$labels_errors = $this->api->print_sticker_gls( $_REQUEST['reference_numbers'] );
+				$labels_errors = $this->api->print_sticker_gls( $_REQUEST['reference_numbers'], intval( $_REQUEST['position'] ) );
 
 				$labels_errors = isset( $labels_errors[ 'message' ] ) ? [
 					'errors' => [
