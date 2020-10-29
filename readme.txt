@@ -4,7 +4,7 @@ Donate link: https://neoship.sk/
 Tags: neoship, shipping
 Requires at least: 4.9
 Tested up to: 5.5
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -86,6 +86,9 @@ Fill the form on [https://info.neoship.sk/sk/kontakt](https://info.neoship.sk/sk
 
 = 2.1.0 =
 * Add functionality, select sticker position
+
+= 2.2.0 =
+* Add free shipping options to carriers
 
 == Upgrade Notice ==
 
