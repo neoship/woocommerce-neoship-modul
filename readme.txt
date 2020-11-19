@@ -90,6 +90,10 @@ Fill the form on [https://info.neoship.sk/sk/kontakt](https://info.neoship.sk/sk
 = 2.2.0 =
 * Add free shipping options to carriers
 
+= 2.3.0 =
+* Add SPS carrier
+* Add carrier choice in export step
+
 == Upgrade Notice ==
 
 = 1.0 =

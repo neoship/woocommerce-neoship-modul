@@ -581,6 +581,9 @@ class Neoship_Admin {
 				$order      	= $order_obj->get_data();
 				$shipping_info  = $order['shipping_lines'][ key($order['shipping_lines']) ]->get_data();
 				$is_gls_package = in_array( $shipping_info['method_id'], $this->gls_shipping_methods );
+				if ( isset( $pkg['shipper'] ) && '' !== $pkg['shipper'] ) {
+					$is_gls_package = $pkg['shipper'] === 'gls';
+				}
 				$parcelshop     = $order_obj->get_meta('_parcelshop_id');
 				$glsparcelshop  = $order_obj->get_meta('_glsparcelshop_id');
 
@@ -613,7 +616,6 @@ class Neoship_Admin {
 				}
 
 				$package['insurance'] = sanitize_text_field( $pkg['insurance'] );
-
 				
 				if ( ! $is_gls_package ) {
 					
@@ -720,7 +722,7 @@ class Neoship_Admin {
 					<h1 class="wp-heading-inline"><?php esc_html_e( 'Export orders to neoship', 'neoship' ); ?></h1>
 					<form method="post">
 						<input type="hidden" name="_wpnonce" value="<?php echo esc_html( $nonce ); ?>">
-						<table class="wp-list-table widefat fixed striped posts">
+						<table class="wp-list-table widefat fixed striped posts neoship-export-table">
 							<tbody>
 			<?php
 			foreach ( $posts_ids as $index => $post_id ) {
@@ -736,45 +738,42 @@ class Neoship_Admin {
 				$is_gls_package	= in_array( $shipping_info['method_id'], $this->gls_shipping_methods );
 
 				?>
-									<tr>
-				<?php if ( ! $is_gls_package ) { ?>
-										<td class="check-column">
-											<img src="<?php echo plugins_url( '/../public/images/sps-logo.png', __FILE__ ) ?>" alt="sps-logo">
-										</td>
-				<?php } else { ?>
-										<td class="check-column">
-											<img src="<?php echo plugins_url( '/../public/images/gls-logo.png', __FILE__ ) ?>" alt="sps-logo">
-										</td>
+									<tr id="neoship-export-row-<?php echo $index ?>" class="<?php echo $is_gls_package ? 'neoship-gls' : 'neoship-sps' ?>">
+										<td class="manage-column neoship-col-shipper-select">
+											<img src="<?php echo plugins_url( '/../public/images/sps-logo.png', __FILE__ ) ?>" alt="sps-logo" class="sps-logo">
+											<img src="<?php echo plugins_url( '/../public/images/gls-logo.png', __FILE__ ) ?>" alt="gls-logo" class="gls-logo">
+				<?php if ( '' === $parcelshop_id && '' === $glsparcelshop_id ) { ?>
+											<select class="neoship-shipper-change" name="packages[<?php echo esc_html( $index ); ?>][shipper]" data-rowid="#neoship-export-row-<?php echo $index ?>">
+												<option value="sps" <?php echo $is_gls_package ? '' : 'selected' ?>>SPS</option>
+												<option value="gls" <?php echo $is_gls_package ? 'selected' : '' ?>>GLS</option>
+											</select>
 				<?php } ?>
+										</td>
 										<td scope="col" class="manage-column">
 											<input type="hidden" name="packages[<?php echo esc_html( $index ); ?>][id]" value="<?php echo esc_html( $order['id'] ); ?>">
 											<a href="#" class="order-preview" data-order-id="<?php echo esc_html( $order['id'] ); ?>"><strong><?php echo esc_html( '#' . $order['number'] . ' ' . $order['billing']['first_name'] . ' ' . $order['billing']['last_name'] ); ?></strong></a>
 										</td>
-				<?php if ( ! $is_gls_package ) { ?>
-										<td scope="col" class="manage-column">
+										<td scope="col" class="manage-column neoship-col-sms-email">
 											<input type="checkbox" name="packages[<?php echo esc_html( $index ); ?>][sms]" value="1" checked>
 											<label for="packages[<?php echo esc_html( $index ); ?>][sms]"><?php esc_html_e( 'Send SMS', 'neoship' ); ?></label>
 											<br>
 											<input type="checkbox" name="packages[<?php echo esc_html( $index ); ?>][email]" value="1" checked>
 											<label for="packages[<?php echo esc_html( $index ); ?>][email]"><?php esc_html_e( 'Send email', 'neoship' ); ?></label>
 										</td>
-				<?php } else { ?>
-										<td></td>
-				<?php } ?>
-										<td scope="col" class="manage-column">
-				<?php if ( ! $is_gls_package ) { ?>
+										<td scope="col" class="manage-column neoship-col-holddelivery">
 											<input type="checkbox" name="packages[<?php echo esc_html( $index ); ?>][holddelivery]" value="1">
 											<label for="packages[<?php echo esc_html( $index ); ?>][holddelivery]"><?php esc_html_e( 'Hold delivery', 'neoship' ); ?></label>
 											<br>
 											<input type="checkbox" name="packages[<?php echo esc_html( $index ); ?>][saturdaydelivery]" value="1">
 											<label for="packages[<?php echo esc_html( $index ); ?>][saturdaydelivery]"><?php esc_html_e( 'Saturday delivery', 'neoship' ); ?></label>
-				<?php } ?>
 										</td>
-										<td scope="col" class="manage-column">
 				<?php if ( '' === $parcelshop_id && ! $is_gls_package ) { ?>
+										<td scope="col" class="manage-column neoship-col-count">
 												<label for="packages[<?php echo esc_html( $index ); ?>][amount]"><?php esc_html_e( 'Amount of packages', 'neoship' ); ?></label><br>
 												<input type="number" min="1" step="1" name="packages[<?php echo esc_html( $index ); ?>][amount]" value="1">
+										</td>
 				<?php } elseif ( '' !== $parcelshop_id || '' !== $glsparcelshop_id ) { ?>
+										<td scope="col" class="manage-column">
 												<strong>Parcelshop</strong>
 				<?php } ?>
 										</td>
@@ -786,8 +785,7 @@ class Neoship_Admin {
 											<label for="packages[<?php echo esc_html( $index ); ?>][insurance]"><?php esc_html_e( 'Amount of insurance', 'neoship' ); ?> (€)</label><br>
 											<input type="number" step="0.01" name="packages[<?php echo esc_html( $index ); ?>][insurance]" value="0">
 										</td>
-				<?php if ( ! $is_gls_package ) { ?>
-										<td scope="col" class="manage-column">
+										<td scope="col" class="manage-column neoship-deliverytype">
 											<label for="packages[<?php echo esc_html( $index ); ?>][deliverytype]"><?php esc_html_e( 'Delivery type', 'neoship' ); ?></label><br>
 											<select name="packages[<?php echo esc_html( $index ); ?>][deliverytype]">
 												<option value=""><?php esc_html_e( 'Standard delivery', 'neoship' ); ?></option>
@@ -795,9 +793,6 @@ class Neoship_Admin {
 												<option value="2"><?php esc_html_e( 'Express to 9:00', 'neoship' ); ?></option>
 											</select>
 										</td>
-				<?php } else { ?>
-										<td></td>
-				<?php } ?>
 									</tr>
 			<?php } ?>
 							</tbody>
@@ -824,6 +819,7 @@ class Neoship_Admin {
 	 */
 	public function request_shipping_init() {
 		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-neoship-wc-parcelshop-shipping-method.php';
+		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-neoship-wc-spscourier-shipping-method.php';
 		if ( get_option( 'neoship_has_gls' ) ) {
 			include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-neoship-wc-glsparcelshop-shipping-method.php';
 			include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-neoship-wc-glscourier-shipping-method.php';
@@ -840,6 +836,7 @@ class Neoship_Admin {
 	 */
 	public function request_shipping_method( $methods ) {
 		$methods['parcelshop'] = 'Neoship_WC_Parcelshop_Shipping_Method';
+		$methods['neoship_spscourier'] = 'Neoship_WC_SpsCourier_Shipping_Method';
 		if ( get_option( 'neoship_has_gls' ) ) {
 			$methods['neoship_glsparcelshop'] = 'Neoship_WC_GlsParcelshop_Shipping_Method';
 			$methods['neoship_glscourier'] = 'Neoship_WC_GlsCourier_Shipping_Method';

@@ -24,3 +24,22 @@
 .widefat .column-wc_actions .neoship-tracking::after{
 	content: "\f319";
 }
+
+.neoship-gls .neoship-col-holddelivery > *,
+.neoship-gls .neoship-col-count > *,
+.neoship-gls .neoship-deliverytype > *,
+.neoship-gls .neoship-col-sms-email > *{
+	display: none;
+}
+
+.neoship-gls .sps-logo{
+	display: none;
+}
+
+.neoship-sps .gls-logo{
+	display: none;
+}
+
+.neoship-col-shipper-select img{
+	vertical-align: middle;
+}

@@ -15,7 +15,7 @@
  * Plugin Name:       Neoship
  * Plugin URI:        neoship
  * Description:       Export orders to neoship
- * Version:           2.2.0
+ * Version:           2.3.0
  * Author:            Neoship
  * Author URI:        https://www.kuskosoft.com
  * License:           GPL-2.0+
