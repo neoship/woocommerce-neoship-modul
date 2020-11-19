@@ -742,7 +742,7 @@ class Neoship_Admin {
 										<td class="manage-column neoship-col-shipper-select">
 											<img src="<?php echo plugins_url( '/../public/images/sps-logo.png', __FILE__ ) ?>" alt="sps-logo" class="sps-logo">
 											<img src="<?php echo plugins_url( '/../public/images/gls-logo.png', __FILE__ ) ?>" alt="gls-logo" class="gls-logo">
-				<?php if ( '' === $parcelshop_id && '' === $glsparcelshop_id ) { ?>
+				<?php if ( '' === $parcelshop_id && '' === $glsparcelshop_id && get_option( 'neoship_has_gls' ) ) { ?>
 											<select class="neoship-shipper-change" name="packages[<?php echo esc_html( $index ); ?>][shipper]" data-rowid="#neoship-export-row-<?php echo $index ?>">
 												<option value="sps" <?php echo $is_gls_package ? '' : 'selected' ?>>SPS</option>
 												<option value="gls" <?php echo $is_gls_package ? 'selected' : '' ?>>GLS</option>
@@ -767,14 +767,14 @@ class Neoship_Admin {
 											<input type="checkbox" name="packages[<?php echo esc_html( $index ); ?>][saturdaydelivery]" value="1">
 											<label for="packages[<?php echo esc_html( $index ); ?>][saturdaydelivery]"><?php esc_html_e( 'Saturday delivery', 'neoship' ); ?></label>
 										</td>
-				<?php if ( '' === $parcelshop_id && ! $is_gls_package ) { ?>
-										<td scope="col" class="manage-column neoship-col-count">
+										<td scope="col" class="manage-column">
+				<?php if ( '' === $parcelshop_id && '' === $glsparcelshop_id ) { ?>
+											<div class="neoship-col-count">
 												<label for="packages[<?php echo esc_html( $index ); ?>][amount]"><?php esc_html_e( 'Amount of packages', 'neoship' ); ?></label><br>
 												<input type="number" min="1" step="1" name="packages[<?php echo esc_html( $index ); ?>][amount]" value="1">
-										</td>
+											</div>
 				<?php } elseif ( '' !== $parcelshop_id || '' !== $glsparcelshop_id ) { ?>
-										<td scope="col" class="manage-column">
-												<strong>Parcelshop</strong>
+											<strong>Parcelshop</strong>
 				<?php } ?>
 										</td>
 										<td scope="col" class="manage-column">
