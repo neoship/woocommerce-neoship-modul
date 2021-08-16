@@ -309,8 +309,6 @@ class Neoship_Admin {
 				$actions['neoship_print_stickers_gls'] = __( 'GLS Send data to shipper and print stickers (PDF)', 'neoship' );
 			}
 		}
-		
-		
 
 		return $actions;
 	}
@@ -386,9 +384,9 @@ class Neoship_Admin {
             $reference_numbers[] = $order['number'];
 		}
 
-		if ( strpos( $action, 'neoship_print_stickers_gls' ) !== false ) {
-			$sticker_position = str_replace( 'neoship_print_stickers_gls_position_', '', $action );
-			$sticker_position = $sticker_position !== '' ? $sticker_position : '1';
+		if ( strpos( $action, 'neoship_print_stickers_gls' ) !== false || $this->v3 ) {
+			$sticker_position = (int) filter_var($action, FILTER_SANITIZE_NUMBER_INT);
+			$sticker_position = $sticker_position ? $sticker_position : '1';
 
 			$location = add_query_arg(
 				array(
@@ -427,6 +425,20 @@ class Neoship_Admin {
 			return $redirect_to;
 		}
 
+		if ( $this->v3 ) {
+
+			$location = add_query_arg(
+				array(
+					'neoship3_acceptance_protocol' => 1,
+					'_wpnonce'       			   => wp_create_nonce( 'neoship_notice_nonce' ),
+				),
+				admin_url( 'edit.php?post_type=shop_order' )
+			);
+
+			wp_safe_redirect( ( $location ) );
+			exit();
+		}
+
         $reference_numbers = [];
         foreach ($posts_ids as $post_id){
             $order = wc_get_order( intval($post_id))->get_data();
@@ -445,10 +457,52 @@ class Neoship_Admin {
 	 */
 	public function neoship_bulk_action_admin_notice() {
 		
+		if ( ! empty( $_REQUEST['neoship3_acceptance_protocol'] ) && ! empty( $_REQUEST['_wpnonce'] ) ) {
+			if ( false !== wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'neoship_notice_nonce' ) ) {
+				
+				$protocol = $this->api->print_acceptance_protocol();
+
+				if ( ! empty( $protocol['errors'] ) ) {
+					echo '<div class="notice notice-error is-dismissible"><p>';
+					echo '<p>';
+					echo '<strong>';
+					printf(  esc_html__( $protocol['errors'] ) );
+					echo '</strong>';
+					echo '</p>';
+					echo '</div>';
+				}
+
+				if ( $protocol['protocol'] != '' ) {
+					echo '<div class="notice notice-success is-dismissible"><p id="neoship_download_sticker_link" >';
+					echo 
+					'<script>
+						var link = document.createElement("a");
+						link.classList.add("button");
+						link.classList.add("action");
+						link.innerHTML = "<strong>' . __( 'Download generated stickers again' ) . '</strong>";
+						link.download = "stickers.pdf";
+						link.href = `data:application/pdf;base64,' . $protocol['protocol'] . '`;
+						link.click();
+						document.getElementById("neoship_download_sticker_link").appendChild(link);
+					</script>';
+					echo '</p></div>';
+				}
+			}
+		}
+
 		if ( ! empty( $_REQUEST['neoship_print_sticker_export'] ) && ! empty( $_REQUEST['_wpnonce'] ) ) {
 			if ( false !== wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'neoship_notice_nonce' ) ) {
 				
-				$labels_errors = $this->api->print_sticker_gls( $_REQUEST['reference_numbers'], intval( $_REQUEST['position'] ) );
+				if ( $this->v3 ) {
+					$labels_errors = $this->api->print_sticker( $_REQUEST['reference_numbers'], intval( $_REQUEST['position'] ) );
+					$tmp_errors = [];
+					foreach ($labels_errors['errors'] as $value) {
+						$tmp_errors[ $value['reference_number'] ] = implode( ',', $value['errors'] );
+					}
+					$labels_errors['errors'] = $tmp_errors;
+				} else {
+					$labels_errors = $this->api->print_sticker_gls( $_REQUEST['reference_numbers'], intval( $_REQUEST['position'] ) );
+				}
 
 				$labels_errors = isset( $labels_errors[ 'message' ] ) ? [
 					'errors' => [
@@ -458,8 +512,9 @@ class Neoship_Admin {
 
 				if ( count( $labels_errors['errors'] ) > 0 ) {
 					echo '<div class="notice notice-error is-dismissible"><p>';
+
 					foreach ( $labels_errors['errors'] as $key => $value ) {
-						$value = is_array( $value ) ? implode( ', ', $value) : $value;
+						$value = is_array( $value ) ? implode( ', ', $value ) : $value;
 						echo '<p>';
 						echo '<strong>';
 						printf(  esc_html__( 'Order %s', 'neoship' ), $key );
@@ -478,7 +533,7 @@ class Neoship_Admin {
 						link.classList.add("action");
 						link.innerHTML = "<strong>' . __( 'Download generated stickers again' ) . '</strong>";
 						link.download = "stickers.pdf";
-						link.href = "data:application/pdf;base64,' . $labels_errors['labels'] . '";
+						link.href = `data:application/pdf;base64,' . $labels_errors['labels'] . '`;
 						link.click();
 						document.getElementById("neoship_download_sticker_link").appendChild(link);
 					</script>';

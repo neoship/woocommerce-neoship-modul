@@ -166,6 +166,58 @@ class Neoship3_Api {
 		return $response;
 	}
 
+	/**
+	 * Handle sticker print.
+	 *
+	 * @since  3.0.0
+	 * @access public
+	 *
+	 * @param string $reference_numbers Packages reference numbers.
+	 * @param string $position Sticker position on A4 paper.
+	 */
+	public function print_sticker( $reference_numbers, $position = 1 ) {
+		if ( false === $this->access_data ) {
+			$this->login();
+		}
+
+		$url  = NEOSHIP3_API_URL . '/package/bulk/';
+		$args = [
+			'headers' => $this->get_headers(),
+			'body' => json_encode([
+				'action' => 'send_print_sticker',
+				'reference_numbers' => $reference_numbers,
+				'sticker_position' => $position,
+			])
+		];
+
+		$response = wp_remote_post( $url, $args );
+		return json_decode( wp_remote_retrieve_body( $response ), true );
+	}
+
+	/**
+	 * Handle acceptance protocol print.
+	 *
+	 * @since  3.0.0
+	 * @access public
+	 *
+	 */
+	public function print_acceptance_protocol() {
+		if ( false === $this->access_data ) {
+			$this->login();
+		}
+
+		$url  = NEOSHIP3_API_URL . '/package/bulk/';
+		$args = [
+			'headers' => $this->get_headers(),
+			'body' => json_encode([
+				'action' => 'daily_closing',
+			])
+		];
+
+		$response = wp_remote_post( $url, $args );
+		return json_decode( wp_remote_retrieve_body( $response ), true );
+	}
+
 
 
 
@@ -338,75 +390,6 @@ class Neoship3_Api {
 		}
 	}
 
-	/**
-	 * Handle sticker print for Gls.
-	 *
-	 * @since  3.0.0
-	 * @access public
-	 *
-	 * @param string $reference_number Package reference number.
-	 * @param string $position Sticker position on A4 paper.
-	 */
-	public function print_sticker_gls( $reference_number, $position = 1 ) {
-		if ( false === $this->access_data ) {
-			$this->login();
-		}
-
-		$data['ref']    			  = $reference_number;
-		$data['firstStickerPosition'] = $position;
-		$data           			  = (object) array_merge( (array) $data, (array) $this->access_data );
-		$url            			  = NEOSHIP3_API_URL . '/package/stickerwitherrors?' . http_build_query( $data );
-		$response       			  = wp_remote_get( $url );
-		$labels_errors  			  = json_decode( wp_remote_retrieve_body( $response ), true );
-
-		return $labels_errors;
-	}
-
-	/**
-	 * Handle sticker print.
-	 *
-	 * @since  3.0.0
-	 * @access public
-	 *
-	 * @param string $template Which sticker print.
-	 * @param string $reference_number Package reference number.
-	 * @param string $position Sticker position on A4 paper.
-	 */
-	public function print_sticker( $template, $reference_number, $position = 1 ) {
-		if ( false === $this->access_data ) {
-			$this->login();
-		}
-
-		$data['ref']      			   = $reference_number;
-		$data['firstStickerPosition'] = $position;
-		$data['template'] 			   = $template;
-		$data             			   = (object) array_merge( (array) $data, (array) $this->access_data );
-
-		$url      = NEOSHIP3_API_URL . '/package/sticker?' . http_build_query( $data );
-		$response = wp_remote_get( $url );
-		$this->handle_pdf( $response );
-	}
-
-	/**
-	 * Handle acceptance protocol print.
-	 *
-	 * @since  3.0.0
-	 * @access public
-	 *
-	 * @param string $reference_number Package reference number.
-	 */
-	public function print_acceptance_protocol( $reference_number ) {
-		if ( false === $this->access_data ) {
-			$this->login();
-		}
-
-		$data['ref'] = $reference_number;
-		$data        = (object) array_merge( (array) $data, (array) $this->access_data );
-
-		$url      = NEOSHIP3_API_URL . '/package/acceptance?' . http_build_query( $data );
-		$response = wp_remote_get( $url );
-		$this->handle_pdf( $response, 'acceptance' );
-	}
 
 	/**
 	 * Handle pdf response.
