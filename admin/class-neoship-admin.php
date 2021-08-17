@@ -65,6 +65,15 @@ class Neoship_Admin {
 	private $api;
 
 	/**
+	 * Neoship version
+	 *
+	 * @since  3.0.0
+	 * @access private
+	 * @var    boolean    $v3    Neoship is v3 version.
+	 */
+	private $v3;
+
+	/**
 	 * NeoshipApi
 	 *
 	 * @since  2.0.0
@@ -85,7 +94,8 @@ class Neoship_Admin {
 		$this->plugin_name 			= $plugin_name;
 		$this->version     			= $version;
 		$this->settings    			= get_option( 'neoship_login' );
-		$this->api         			= new Neoship_Api();
+		$this->v3    				= ! empty( get_option( 'neoship_login' )['neoshipv3'] );
+		$this->api         			= $this->v3 ? new Neoship3_Api() : new Neoship_Api();
 		$this->gls_shipping_methods = [ 'neoship_glscourier', 'neoship_glsparcelshop' ];
 
 	}
@@ -166,7 +176,7 @@ class Neoship_Admin {
 			'',
 			'manage_woocommerce',
 			'neoship-export',
-			array( $this, 'export_packages_to_neoship_step' ),
+			array( $this, $this->v3 ? 'export_packages_to_neoship3_step' : 'export_packages_to_neoship_step' ),
 			null
 		);
 	}
@@ -203,6 +213,14 @@ class Neoship_Admin {
 			'neoship-settings-section'
 		);
 
+		add_settings_field(
+			'neoshipv3',
+			__( 'v3', 'neoship' ),
+			array( $this, 'neoship_settings_version_callback' ),
+			'neoship-settings',
+			'neoship-settings-section'
+		);
+
 	}
 
 	/**
@@ -232,7 +250,17 @@ class Neoship_Admin {
 	 * @access public
 	 */
 	public function neoship_settings_secret_callback() {
-		echo '<input id="clientsecret" autocomplete="off" class="regular-text" type="text" name="neoship_login[clientsecret]" value="' . esc_html( get_option( 'neoship_login' )['clientsecret'] ) . '">';
+		echo '<input id="clientsecret" autocomplete="off" class="regular-text" type="password" name="neoship_login[clientsecret]" value="' . esc_html( get_option( 'neoship_login' )['clientsecret'] ) . '">';
+	}
+
+	/**
+	 * Render neoship v3 checkbox field.
+	 *
+	 * @since  3.0.0
+	 * @access public
+	 */
+	public function neoship_settings_version_callback() {
+		echo '<input id="neoshipv3" autocomplete="off" type="checkbox" name="neoship_login[neoshipv3]" ' . ( ! empty( get_option( 'neoship_login' )['neoshipv3'] ) ? 'checked' : '' ) . '>';
 	}
 
 	/**
@@ -270,14 +298,16 @@ class Neoship_Admin {
 	 * @param array $actions Default actions.
 	 */
 	public function neoship_order_list_bulk_actions( $actions ) {
+		$actions['neoship_acceptance_protocol']          = __( 'Acceptance protocol', 'neoship' );
 		$actions['neoship_export']                       = __( 'Export to Neoship', 'neoship' ) . ' (' . $this->api->get_user_credit() . '€)';
 		$actions['neoship_print_stickers']               = __( 'Print stickers (PDF)', 'neoship' );
-		$actions['neoship_print_stickers_zebra_102x152'] = __( 'Print zebra stickers(PDF) 102x152', 'neoship' );
-		$actions['neoship_print_stickers_zebra_80x214']  = __( 'Print zebra stickers (PDF) 80x214', 'neoship' );
-		$actions['neoship_acceptance_protocol']          = __( 'Acceptance protocol', 'neoship' );
-		
-		if ( get_option( 'neoship_has_gls' ) ) {
-			$actions['neoship_print_stickers_gls'] = __( 'GLS Send data to shipper and print stickers (PDF)', 'neoship' );
+
+		if ( ! $this->v3 ) {
+			$actions['neoship_print_stickers_zebra_102x152'] = __( 'Print zebra stickers(PDF) 102x152', 'neoship' );
+			$actions['neoship_print_stickers_zebra_80x214']  = __( 'Print zebra stickers (PDF) 80x214', 'neoship' );
+			if ( get_option( 'neoship_has_gls' ) ) {
+				$actions['neoship_print_stickers_gls'] = __( 'GLS Send data to shipper and print stickers (PDF)', 'neoship' );
+			}
 		}
 
 		return $actions;
@@ -354,9 +384,9 @@ class Neoship_Admin {
             $reference_numbers[] = $order['number'];
 		}
 
-		if ( strpos( $action, 'neoship_print_stickers_gls' ) !== false ) {
-			$sticker_position = str_replace( 'neoship_print_stickers_gls_position_', '', $action );
-			$sticker_position = $sticker_position !== '' ? $sticker_position : '1';
+		if ( strpos( $action, 'neoship_print_stickers_gls' ) !== false || $this->v3 ) {
+			$sticker_position = (int) filter_var($action, FILTER_SANITIZE_NUMBER_INT);
+			$sticker_position = $sticker_position ? $sticker_position : '1';
 
 			$location = add_query_arg(
 				array(
@@ -395,6 +425,20 @@ class Neoship_Admin {
 			return $redirect_to;
 		}
 
+		if ( $this->v3 ) {
+
+			$location = add_query_arg(
+				array(
+					'neoship3_acceptance_protocol' => 1,
+					'_wpnonce'       			   => wp_create_nonce( 'neoship_notice_nonce' ),
+				),
+				admin_url( 'edit.php?post_type=shop_order' )
+			);
+
+			wp_safe_redirect( ( $location ) );
+			exit();
+		}
+
         $reference_numbers = [];
         foreach ($posts_ids as $post_id){
             $order = wc_get_order( intval($post_id))->get_data();
@@ -413,10 +457,52 @@ class Neoship_Admin {
 	 */
 	public function neoship_bulk_action_admin_notice() {
 		
+		if ( ! empty( $_REQUEST['neoship3_acceptance_protocol'] ) && ! empty( $_REQUEST['_wpnonce'] ) ) {
+			if ( false !== wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'neoship_notice_nonce' ) ) {
+				
+				$protocol = $this->api->print_acceptance_protocol();
+
+				if ( ! empty( $protocol['errors'] ) ) {
+					echo '<div class="notice notice-error is-dismissible"><p>';
+					echo '<p>';
+					echo '<strong>';
+					printf(  esc_html__( $protocol['errors'] ) );
+					echo '</strong>';
+					echo '</p>';
+					echo '</div>';
+				}
+
+				if ( $protocol['protocol'] != '' ) {
+					echo '<div class="notice notice-success is-dismissible"><p id="neoship_download_sticker_link" >';
+					echo 
+					'<script>
+						var link = document.createElement("a");
+						link.classList.add("button");
+						link.classList.add("action");
+						link.innerHTML = "<strong>' . __( 'Download generated stickers again' ) . '</strong>";
+						link.download = "stickers.pdf";
+						link.href = `data:application/pdf;base64,' . $protocol['protocol'] . '`;
+						link.click();
+						document.getElementById("neoship_download_sticker_link").appendChild(link);
+					</script>';
+					echo '</p></div>';
+				}
+			}
+		}
+
 		if ( ! empty( $_REQUEST['neoship_print_sticker_export'] ) && ! empty( $_REQUEST['_wpnonce'] ) ) {
 			if ( false !== wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'neoship_notice_nonce' ) ) {
 				
-				$labels_errors = $this->api->print_sticker_gls( $_REQUEST['reference_numbers'], intval( $_REQUEST['position'] ) );
+				if ( $this->v3 ) {
+					$labels_errors = $this->api->print_sticker( $_REQUEST['reference_numbers'], intval( $_REQUEST['position'] ) );
+					$tmp_errors = [];
+					foreach ($labels_errors['errors'] as $value) {
+						$tmp_errors[ $value['reference_number'] ] = implode( ',', $value['errors'] );
+					}
+					$labels_errors['errors'] = $tmp_errors;
+				} else {
+					$labels_errors = $this->api->print_sticker_gls( $_REQUEST['reference_numbers'], intval( $_REQUEST['position'] ) );
+				}
 
 				$labels_errors = isset( $labels_errors[ 'message' ] ) ? [
 					'errors' => [
@@ -426,8 +512,9 @@ class Neoship_Admin {
 
 				if ( count( $labels_errors['errors'] ) > 0 ) {
 					echo '<div class="notice notice-error is-dismissible"><p>';
+
 					foreach ( $labels_errors['errors'] as $key => $value ) {
-						$value = is_array( $value ) ? implode( ', ', $value) : $value;
+						$value = is_array( $value ) ? implode( ', ', $value ) : $value;
 						echo '<p>';
 						echo '<strong>';
 						printf(  esc_html__( 'Order %s', 'neoship' ), $key );
@@ -446,7 +533,7 @@ class Neoship_Admin {
 						link.classList.add("action");
 						link.innerHTML = "<strong>' . __( 'Download generated stickers again' ) . '</strong>";
 						link.download = "stickers.pdf";
-						link.href = "data:application/pdf;base64,' . $labels_errors['labels'] . '";
+						link.href = `data:application/pdf;base64,' . $labels_errors['labels'] . '`;
 						link.click();
 						document.getElementById("neoship_download_sticker_link").appendChild(link);
 					</script>';
@@ -484,8 +571,24 @@ class Neoship_Admin {
 					foreach ( $failed as $value ) {
 						echo '<p>';
 						/* translators: %d: number of orders */
-						$output = printf( '<strong>' . esc_html__( 'Order %d', 'neoship' ) . '</strong>: ' . esc_html( $value['result'] ), intval( $value['variableNumber'] ) );
-						echo esc_html( $output );
+						if ( $this->v3 ) {
+							$errors = [];
+							foreach ($value['errors'] as $key => $error) {
+								if ( 'services' !== $key && ! empty($error) ) {
+									$errors[] = "$key: " . implode( ', ', $error );
+								} else {
+									foreach ($error as $keyService => $errorService) {
+										if ( ! empty($errorService) ) {
+											$errors[] = "$keyService: " . implode( ', ', $errorService );
+										}
+									}
+								}
+							}
+
+							printf( '<strong>' . esc_html__( 'Order %d', 'neoship' ) . '</strong>: ' . esc_html( implode( ',', $errors ) ), intval( $value['reference_number'] ) );
+						} else {
+							printf( '<strong>' . esc_html__( 'Order %d', 'neoship' ) . '</strong>: ' . esc_html( $value['result'] ), intval( $value['variableNumber'] ) );
+						}
 						echo '</p>';
 					}
 
@@ -548,10 +651,16 @@ class Neoship_Admin {
 			$order_obj      = $order->get_data();
 			$shipping_info  = $order_obj['shipping_lines'][ key($order_obj['shipping_lines']) ]->get_data();
 			$is_gls_package = in_array( $shipping_info['method_id'], $this->gls_shipping_methods );
-			$tracking_url	= $is_gls_package ? '/glstracking/packageReference/' : '/tracking/packageReference/';
+
+			if ( $this->v3 ) {
+				$tracking_url = NEOSHIP3_API_URL . '/all/tracking/user/' . $this->settings['userid'] . '/' . $order_number;
+			} else {
+				$tracking_url = $is_gls_package ? '/glstracking/packageReference/' : '/tracking/packageReference/';
+				$tracking_url = NEOSHIP_TRACKING_URL . $tracking_url . $this->settings['userid'] . '/' . $order_number;
+			}
 
 			$actions['neoship-tracking'] = array(
-				'url'    => NEOSHIP_TRACKING_URL . $tracking_url . $this->settings['userid'] . '/' . $order_number,
+				'url'    => $tracking_url,
 				'name'   => __( 'Tracking', 'neoship' ),
 				'action' => 'neoship-tracking',
 			);
@@ -842,6 +951,189 @@ class Neoship_Admin {
 			$methods['neoship_glscourier'] = 'Neoship_WC_GlsCourier_Shipping_Method';
 		}
 		return $methods;
+	}
+
+
+
+	/**
+	 * Neoship export page.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 */
+	public function export_packages_to_neoship3_step() {
+
+		if ( isset( $_POST['packages'] ) && is_array( $_POST['packages'] ) && isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'neoship-form-nonce' ) ) {
+
+			$user		 		= $this->api->get_user();
+			$order_number_to_id = [];
+			$packages 			= array();
+
+			foreach ( $_POST['packages'] as $pkg ) {
+				$order_obj      = wc_get_order( intval( $pkg['id'] ) );
+				$order      	= $order_obj->get_data();
+				$shipping_info  = $order['shipping_lines'][ key($order['shipping_lines']) ]->get_data();
+				$is_gls_package = in_array( $shipping_info['method_id'], $this->gls_shipping_methods );
+				if ( isset( $pkg['shipper'] ) && '' !== $pkg['shipper'] ) {
+					$is_gls_package = $pkg['shipper'] === 'gls';
+				}
+				$parcelshop     = $order_obj->get_meta('_parcelshop_id');
+				$glsparcelshop  = $order_obj->get_meta('_glsparcelshop_id');
+
+				$parcelshop_id = null;
+				if ( $parcelshop ) {
+					$parcelshop_id = $parcelshop;
+				}
+				if ( $glsparcelshop ) {
+					$parcelshop_id = $glsparcelshop;
+				}
+
+				$package = [
+					"reference_number" => $order['number'],
+
+					"sender_name" => $user['address']['name'],
+					"sender_company" => $user['address']['company'],
+					"sender_street" => $user['address']['street'],
+					"sender_house_number" => $user['address']['house_number'],
+					"sender_city" => $user['address']['city'],
+					"sender_zip" => $user['address']['zip'],
+					"sender_state_code" => $user['address']['state']['code'],
+					"sender_email" => $user['address']['email'],
+					"sender_phone" => $user['address']['phone'],
+
+
+					"receiver_name" => $order['shipping']['first_name'] . ' ' . $order['shipping']['last_name'],
+					"receiver_company" => $order['shipping']['company'],
+					"receiver_street" => $order['shipping']['address_1'],
+					"receiver_house_number" => null,
+					"receiver_city" => $order['shipping']['city'],
+					"receiver_zip" => $order['shipping']['postcode'],
+					"receiver_state_code" => $order['shipping']['country'],
+					"receiver_email" => $order['billing']['email'],
+					"receiver_phone" => $order['billing']['phone'],
+
+
+					"cod_price" => in_array( $order['payment_method'], [ 'cod', 'dobirka' ] ) ? sanitize_text_field( $pkg['cod'] ) : null,
+					"cod_currency_code" => $order['currency'],
+					"cod_reference" => null,
+
+					"insurance" => sanitize_text_field( $pkg['insurance'] ),
+					"reverse" => false,
+					"parcelshop" => $parcelshop_id,
+					"count_of_packages" => $parcelshop_id ? 1 : intval( $pkg['amount'] )
+				];
+
+                $order_number_to_id[$order['number']] = $order['id'];
+				
+				$packages[] = $package;
+			}
+
+			$response = $this->api->create_packages( $packages, $is_gls_package ? 1 : 2 ); ///gls = 1, sps = 2 shipper id
+
+			$success = 200 === wp_remote_retrieve_response_code( $response ) ? json_decode( wp_remote_retrieve_body( $response ), true ) : [];
+			$failed = 422 === wp_remote_retrieve_response_code( $response ) ? json_decode( wp_remote_retrieve_body( $response ), true ) : [];
+
+			foreach ( $success as $value ) {
+				$order = wc_get_order( intval( $order_number_to_id[ $value['reference_number'] ] ) );
+				$order->update_status( 'export-to-neoship', gmdate( 'd-m-Y H:i:s' ) );
+			}
+
+			$location = add_query_arg(
+				array(
+					'neoship_export' => 1,
+					'success'        => rawurlencode( wp_json_encode( $success ) ),
+					'failed'         => rawurlencode( wp_json_encode( $failed ) ),
+					'_wpnonce'       => wp_create_nonce( 'neoship_notice_nonce' ),
+				),
+				admin_url( 'edit.php?post_type=shop_order' )
+			);
+
+			wp_safe_redirect( ( $location ) );
+
+			exit();
+		}
+
+		if ( isset( $_GET['posts_ids'] ) ) {
+			$posts_ids = explode( ',', sanitize_text_field( wp_unslash( $_GET['posts_ids'] ) ) );
+			if ( '' === $posts_ids[0] ) {
+				wp_safe_redirect( admin_url( 'edit.php?post_type=shop_order' ) );
+				exit();
+			}
+
+			$wc_template = new WC_Admin_List_Table_Orders();
+			$wc_template->order_preview_template();
+			$nonce = wp_create_nonce( 'neoship-form-nonce' );
+
+			?>
+				<div class="wrap neoship">
+					<h1 class="wp-heading-inline"><?php esc_html_e( 'Export orders to neoship', 'neoship' ); ?></h1>
+					<form method="post">
+						<input type="hidden" name="_wpnonce" value="<?php echo esc_html( $nonce ); ?>">
+						<table class="wp-list-table widefat fixed striped posts neoship-export-table">
+							<tbody>
+			<?php
+			foreach ( $posts_ids as $index => $post_id ) {
+				$id = intval( $post_id, 0 );
+				if ( 0 === $id ) {
+					continue;
+				}
+				$order_obj         = wc_get_order( $id );
+				$order             = $order_obj->get_data();
+				$shipping_info     = $order['shipping_lines'][ key($order['shipping_lines']) ]->get_data();
+				$parcelshop_id     = $order_obj->get_meta('_parcelshop_id');
+				$glsparcelshop_id  = $order_obj->get_meta('_glsparcelshop_id');
+				$is_gls_package	= in_array( $shipping_info['method_id'], $this->gls_shipping_methods );
+
+				?>
+									<tr id="neoship-export-row-<?php echo $index ?>" class="<?php echo $is_gls_package ? 'neoship-gls' : 'neoship-sps' ?>">
+										<td class="manage-column neoship-col-shipper-select">
+											<img src="<?php echo plugins_url( '/../public/images/sps-logo.png', __FILE__ ) ?>" alt="sps-logo" class="sps-logo">
+											<img src="<?php echo plugins_url( '/../public/images/gls-logo.png', __FILE__ ) ?>" alt="gls-logo" class="gls-logo">
+				<?php if ( '' === $parcelshop_id && '' === $glsparcelshop_id && get_option( 'neoship_has_gls' ) ) { ?>
+											<select class="neoship-shipper-change" name="packages[<?php echo esc_html( $index ); ?>][shipper]" data-rowid="#neoship-export-row-<?php echo $index ?>">
+												<option value="sps" <?php echo $is_gls_package ? '' : 'selected' ?>>SPS</option>
+												<option value="gls" <?php echo $is_gls_package ? 'selected' : '' ?>>GLS</option>
+											</select>
+				<?php } ?>
+										</td>
+										<td scope="col" class="manage-column">
+											<input type="hidden" name="packages[<?php echo esc_html( $index ); ?>][id]" value="<?php echo esc_html( $order['id'] ); ?>">
+											<a href="#" class="order-preview" data-order-id="<?php echo esc_html( $order['id'] ); ?>"><strong><?php echo esc_html( '#' . $order['number'] . ' ' . $order['billing']['first_name'] . ' ' . $order['billing']['last_name'] ); ?></strong></a>
+										</td>
+										<td scope="col" class="manage-column">
+				<?php if ( '' === $parcelshop_id && '' === $glsparcelshop_id ) { ?>
+											<div class="neoship-col-count-of-packages">
+												<label for="packages[<?php echo esc_html( $index ); ?>][amount]"><?php esc_html_e( 'Amount of packages', 'neoship' ); ?></label><br>
+												<input type="number" min="1" step="1" name="packages[<?php echo esc_html( $index ); ?>][amount]" value="1">
+											</div>
+				<?php } elseif ( '' !== $parcelshop_id || '' !== $glsparcelshop_id ) { ?>
+											<strong>Parcelshop</strong>
+				<?php } ?>
+										</td>
+										<td scope="col" class="manage-column">
+											<label for="packages[<?php echo esc_html( $index ); ?>][cod]"><?php esc_html_e( 'Amount of COD', 'neoship' ); ?></label><br>
+											<input type="number" step="0.01" name="packages[<?php echo esc_html( $index ); ?>][cod]" value="<?php echo in_array( $order['payment_method'], [ 'cod', 'dobirka' ] ) ? $order['total'] : 0 ?>">
+										</td>
+										<td scope="col" class="manage-column">
+											<label for="packages[<?php echo esc_html( $index ); ?>][insurance]"><?php esc_html_e( 'Amount of insurance', 'neoship' ); ?> (€)</label><br>
+											<input type="number" step="0.01" name="packages[<?php echo esc_html( $index ); ?>][insurance]" value="">
+										</td>
+									</tr>
+			<?php } ?>
+							</tbody>
+						</table>
+						<div class="tablenav bottom">
+							<div class="alignright actions">
+								<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=shop_order' ) ); ?>" class="button action"><?php esc_html_e( 'Back' ); ?></a>
+								<button type="submit" class="button action"><?php esc_html_e( 'Export', 'neoship' ); ?></buttpn>
+							</div>
+						</div>
+					</form>
+				</div>
+			<?php
+			exit();
+		}
+		wp_safe_redirect( admin_url( 'edit.php?post_type=shop_order' ) );
 	}
 
 }
