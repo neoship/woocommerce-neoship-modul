@@ -651,10 +651,16 @@ class Neoship_Admin {
 			$order_obj      = $order->get_data();
 			$shipping_info  = $order_obj['shipping_lines'][ key($order_obj['shipping_lines']) ]->get_data();
 			$is_gls_package = in_array( $shipping_info['method_id'], $this->gls_shipping_methods );
-			$tracking_url	= $is_gls_package ? '/glstracking/packageReference/' : '/tracking/packageReference/';
+
+			if ( $this->v3 ) {
+				$tracking_url = NEOSHIP3_API_URL . '/all/tracking/user/' . $this->settings['userid'] . '/' . $order_number;
+			} else {
+				$tracking_url = $is_gls_package ? '/glstracking/packageReference/' : '/tracking/packageReference/';
+				$tracking_url = NEOSHIP_TRACKING_URL . $tracking_url . $this->settings['userid'] . '/' . $order_number;
+			}
 
 			$actions['neoship-tracking'] = array(
-				'url'    => NEOSHIP_TRACKING_URL . $tracking_url . $this->settings['userid'] . '/' . $order_number,
+				'url'    => $tracking_url,
 				'name'   => __( 'Tracking', 'neoship' ),
 				'action' => 'neoship-tracking',
 			);
