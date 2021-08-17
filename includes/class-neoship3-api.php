@@ -218,61 +218,60 @@ class Neoship3_Api {
 		return json_decode( wp_remote_retrieve_body( $response ), true );
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	/**
-	 * Save user id to config.
+	 * Get parcelshops.
 	 *
 	 * @since  3.0.0
 	 * @access public
+	 *
+	 * @param bool $all Get all data.
 	 */
-	public function get_user_address() {
-		if ( false === $this->access_data ) {
-			$this->login();
-		}
-
-		$url      = NEOSHIP3_API_URL . '/user/?' . http_build_query( $this->access_data );
-		$response = wp_remote_get( $url );
+	public function get_parcel_shops( $shipper_id ) {
+		$url      = NEOSHIP3_API_URL . '/all/parcelshop/list/' . $shipper_id;
+		$response = wp_remote_get( $url, [
+			'headers' => [
+				'Content-Type' => 'application/json'
+			],
+		] );
 
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			$this->error_message( __( 'Something is wrong. Please refresh the page and try again' ) );
+			$this->error_message( __( 'Something is wrong. Please refresh the page and try again', 'neoship' ) );
 		}
 
-		$user = json_decode( wp_remote_retrieve_body( $response ), true );
+		$parcel_shops = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		$this->login_data['userid'] = $user['id'];
-		update_option( 'neoship_login', $this->login_data );
+		$return_parcel = array();
+		foreach ( $parcel_shops as $parcelshop ) {
+			$return_parcel[ $parcelshop['id'] ] = $parcelshop['city'] . ', ' . $parcelshop['name'];
+		}
+		return $return_parcel;
+	}
 
-		$user['address']['state'] = $user['address']['state']['id'];
-		unset( $user['address']['id'] );
-		$user['address']['zIP'] = $user['address']['zip'];
-		unset( $user['address']['zip'] );
-		return $user['address'];
+	/**
+	 * Get parcelshop.
+	 *
+	 * @since  3.0.0
+	 * @access public
+	 *
+	 * @param bool $all Get all data.
+	 */
+	public function get_parcel_shop( $parcelshop_id ) {
+		$url      = NEOSHIP3_API_URL . '/all/parcelshop/' . $parcelshop_id;
+		$response = wp_remote_get( $url, [
+			'headers' => [
+				'Content-Type' => 'application/json'
+			],
+		] );
+
+		if ( wp_remote_retrieve_response_code( $response ) === 404 ) {
+			return null;
+		}
+
+		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			$this->error_message( __( 'Something is wrong. Please refresh the page and try again', 'neoship' ) );
+		}
+
+		return json_decode( wp_remote_retrieve_body( $response ), true );
 	}
 
 	/**
@@ -282,72 +281,8 @@ class Neoship3_Api {
 	 * @access public
 	 */
 	public function get_user_credit() {
-		if ( false === $this->access_data ) {
-			$this->login();
-		}
-
-		$url      = NEOSHIP3_API_URL . '/user/?' . http_build_query( $this->access_data );
-		$response = wp_remote_get( $url );
-
-		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			return 0;
-		}
-
-		$user = json_decode( wp_remote_retrieve_body( $response ), true );
-		return round( $user['kredit'], 2 );
-	}
-
-	/**
-	 * Get states code array by ids.
-	 *
-	 * @since  3.0.0
-	 * @access public
-	 */
-	public function get_states_ids() {
-		if ( false === $this->access_data ) {
-			$this->login();
-		}
-
-		$url      = NEOSHIP3_API_URL . '/state/?' . http_build_query( $this->access_data );
-		$response = wp_remote_get( $url );
-
-		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			$this->error_message( __( 'Something is wrong. Please refresh the page and try again' ) );
-		}
-
-		$states            = json_decode( wp_remote_retrieve_body( $response ), true );
-		$state_ids_by_code = array();
-		foreach ( $states as $state ) {
-			$state_ids_by_code[ $state['code'] ] = $state['id'];
-		}
-		return $state_ids_by_code;
-	}
-
-	/**
-	 * Get currencies by code.
-	 *
-	 * @since  3.0.0
-	 * @access public
-	 */
-	public function get_currencies_ids() {
-		if ( false === $this->access_data ) {
-			$this->login();
-		}
-
-		$url      = NEOSHIP3_API_URL . '/currency/?' . http_build_query( $this->access_data );
-		$response = wp_remote_get( $url );
-
-		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			$this->error_message( __( 'Something is wrong. Please refresh the page and try again', 'neoship' ) );
-		}
-
-		$currencies           = json_decode( wp_remote_retrieve_body( $response ), true );
-		$currency_ids_by_code = array();
-		foreach ( $currencies as $currency ) {
-			$currency_ids_by_code[ $currency['code'] ] = $currency['id'];
-		}
-
-		return $currency_ids_by_code;
+		$user = $this->get_user();
+		return round( $user['credit'], 2 );
 	}
 
 	/**
@@ -388,94 +323,5 @@ class Neoship3_Api {
 		if ( $exit ) {
 			exit();
 		}
-	}
-
-
-	/**
-	 * Handle pdf response.
-	 *
-	 * @since  3.0.0
-	 * @access private
-	 *
-	 * @param array  $response Response status.
-	 * @param string $name File name.
-	 */
-	private function handle_pdf( $response, $name = 'stickers' ) {
-		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			wp_safe_redirect(
-				add_query_arg(
-					array(
-						'neoship_error' => '1',
-						'error'         => __( 'You are trying Neoship action on orders which are not imported to neoship', 'neoship' ),
-					),
-					admin_url( 'edit.php?post_type=shop_order' )
-				)
-			);
-			exit();
-		}
-		header( 'Cache-Control: public' );
-		header( 'Content-type: application/pdf' );
-		header( 'Content-Disposition: attachment; filename="' . $name . '.pdf"' );
-		header( 'Content-Length: ' . strlen( wp_remote_retrieve_body( $response ) ) );
-		echo wp_remote_retrieve_body( $response );
-		exit();
-	}
-
-	/**
-	 * Get parcelshops.
-	 *
-	 * @since  3.0.0
-	 * @access public
-	 *
-	 * @param bool $all Get all data.
-	 */
-	public function get_parcel_shops( $all = false ) {
-		$url      = NEOSHIP3_API_URL . '/public/parcelshop/';
-		$response = wp_remote_get( $url );
-
-		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			$this->error_message( __( 'Something is wrong. Please refresh the page and try again', 'neoship' ) );
-		}
-
-		$parcel_shops = json_decode( wp_remote_retrieve_body( $response ), true );
-
-		$return_parcel = array();
-		foreach ( $parcel_shops as $parcelshop ) {
-			if ( $all ) {
-				$return_parcel[ $parcelshop['id'] ] = $parcelshop;
-			} else {
-				$return_parcel[ $parcelshop['id'] ] = $parcelshop['address']['city'] . ', ' . $parcelshop['address']['company'];
-			}
-		}
-		return $return_parcel;
-	}
-
-	/**
-	 * Get gls parcelshops.
-	 *
-	 * @since  3.0.0
-	 * @access public
-	 *
-	 * @param bool $all Get all data.
-	 */
-	public function get_gls_parcel_shops( $all = false ) {
-		$url      = NEOSHIP3_API_URL . '/public/glsparcelshop/';
-		$response = wp_remote_get( $url );
-
-		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			$this->error_message( __( 'Something is wrong. Please refresh the page and try again', 'neoship' ) );
-		}
-
-		$parcel_shops = json_decode( wp_remote_retrieve_body( $response ), true );
-
-		$return_parcel = array();
-		foreach ( $parcel_shops as $parcelshop ) {
-			if ( $all ) {
-				$return_parcel[ $parcelshop['parcelShopId'] ] = $parcelshop;
-			} else {
-				$return_parcel[ $parcelshop['parcelShopId'] ] = $parcelshop['cityName'] . ', ' . $parcelshop['name'];
-			}
-		}
-		return $return_parcel;
 	}
 }

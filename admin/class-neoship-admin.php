@@ -67,7 +67,7 @@ class Neoship_Admin {
 	/**
 	 * Neoship version
 	 *
-	 * @since  1.0.0
+	 * @since  3.0.0
 	 * @access private
 	 * @var    boolean    $v3    Neoship is v3 version.
 	 */
@@ -1020,7 +1020,7 @@ class Neoship_Admin {
 					"insurance" => sanitize_text_field( $pkg['insurance'] ),
 					"reverse" => false,
 					"parcelshop" => $parcelshop_id,
-					"count_of_packages" => intval( $pkg['amount'] )
+					"count_of_packages" => $parcelshop_id ? 1 : intval( $pkg['amount'] )
 				];
 
                 $order_number_to_id[$order['number']] = $order['id'];
@@ -1116,7 +1116,7 @@ class Neoship_Admin {
 										</td>
 										<td scope="col" class="manage-column">
 											<label for="packages[<?php echo esc_html( $index ); ?>][insurance]"><?php esc_html_e( 'Amount of insurance', 'neoship' ); ?> (€)</label><br>
-											<input type="number" step="0.01" name="packages[<?php echo esc_html( $index ); ?>][insurance]" value="0">
+											<input type="number" step="0.01" name="packages[<?php echo esc_html( $index ); ?>][insurance]" value="">
 										</td>
 									</tr>
 			<?php } ?>
