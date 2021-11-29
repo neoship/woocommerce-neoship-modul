@@ -98,8 +98,12 @@ class Neoship_Public {
 		 */
 
 		if ( is_checkout() ) {
-            wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/neoship-public.css', array(), $this->version, 'all' );
-			wp_enqueue_style( 'select2', plugin_dir_url( __FILE__ ) . 'css/select2.min.css', array(), $this->version, 'all' );
+            if ( $this->v3 ) {
+                wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/neoship-public.css', array(), $this->version, 'all' );
+            } else {
+                wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/neoship-public.css', array(), $this->version, 'all' );
+                wp_enqueue_style('select2', plugin_dir_url(__FILE__) . 'css/select2.min.css', array(), $this->version, 'all');
+            }
 		}
 
 	}
@@ -124,8 +128,14 @@ class Neoship_Public {
 		 */
 
 		if ( is_checkout() ) {
-			wp_enqueue_script( 'select2', plugin_dir_url( __FILE__ ) . 'js/select2.min.js', array( 'jquery' ), $this->version, false );
-            wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/neoship-public.js', array( 'jquery', 'select2' ), $this->version, false );
+            if ( $this->v3 ) {
+                wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/neoship-public.js', array( 'jquery' ), $this->version, false );
+                wp_enqueue_script( 'ParcelshopIframe', plugin_dir_url( __FILE__ ) . 'js/ParcelshopIframe.js', array( 'jquery', $this->plugin_name), $this->version, false );
+
+            } else {
+                wp_enqueue_script('select2', plugin_dir_url(__FILE__) . 'js/select2.min.js', array('jquery'), $this->version, false);
+                wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/neoship-public.js', array( 'jquery', 'select2' ), $this->version, false );
+            }
 		}
 
 	}
@@ -142,28 +152,48 @@ class Neoship_Public {
 		if ( ! is_checkout() ) {
 			return; // Only on checkout page.
 		}
-
 		$customer_carrier_method = 'parcelshop';
 
 		if ( $method->method_id === $customer_carrier_method ) { //SPS parcelshop
 			$chosen_method_id = WC()->session->chosen_shipping_methods[ $index ];
 			if ( substr($chosen_method_id, 0, strlen($customer_carrier_method) ) == $customer_carrier_method ) {
-				if ( $this->v3 ) {
-					$parcelshops = $this->api->get_parcel_shops( 2 ); //2 id of sps
+                echo '<div class="parcelshop-carrier">';
+                if ( $this->v3 ) {
+                    woocommerce_form_field(
+                        'parcelshop_id',
+                        array(
+                            'type'     => 'text',
+                            'class'    => array( 'form-row-wide' ),
+                            'required' => true,
+                        ),
+                        WC()->checkout->get_value( 'parcelshop_id' )
+                    );
+                    woocommerce_form_field(
+                        'parcelshop_name',
+                        array(
+                            'type'     => 'text',
+                            'class'    => array( 'form-row-wide carrier-name' ),
+                            'required' => true,
+                            'placeholder' => 'Zvoľte výdajne miesto',
+                        ),
+                        WC()->checkout->get_value( 'parcelshop_name' )
+                    );
 				} else {
 					$parcelshops = $this->api->get_parcel_shops();
-				}
-				echo '<div class="parcelshop-carrier">';
-				woocommerce_form_field(
-					'parcelshop_id',
-					array(
-						'type'     => 'select',
-						'class'    => array( 'form-row-wide carrier-name' ),
-						'required' => true,
+                    woocommerce_form_field(
+                        'parcelshop_id',
+                        array(
+                            'type'     => 'text',
+                            'class'    => array( 'form-row-wide carrier-name' ),
+                            'required' => true,
+                            'placeholder' => 'Zvolte vydajne miesto',
+                            'custom_attribute' => 'hidden',
 						'options'  => $parcelshops,
-					),
-					WC()->checkout->get_value( 'parcelshop_id' )
-				);
+                        ),
+                        WC()->checkout->get_value( 'parcelshop_id' )
+                    );
+				}
+
 				echo '</div>';
 			}
 		}
@@ -173,25 +203,75 @@ class Neoship_Public {
 		if ( $method->method_id === $customer_carrier_method ) { // GLS parcelshop
 			$chosen_method_id = WC()->session->chosen_shipping_methods[ $index ];
 			if ( substr($chosen_method_id, 0, strlen($customer_carrier_method) ) == $customer_carrier_method ) {
-				if ( $this->v3 ) {
-					$parcelshops = $this->api->get_parcel_shops( 1 ); //1 id of sps
+                echo '<div class="parcelshop-carrier">';
+                if ( $this->v3 ) {
+                    woocommerce_form_field(
+                        'glsparcelshop_id',
+                        array(
+                            'type'     => 'text',
+                            'class'    => array( 'form-row-wide' ),
+                            'required' => true,
+                        ),
+                        WC()->checkout->get_value( 'glsparcelshop_id' )
+                    );
+                    woocommerce_form_field(
+                        'glsparcelshop_name',
+                        array(
+                            'type'     => 'text',
+                            'class'    => array( 'form-row-wide carrier-name' ),
+                            'required' => true,
+                            'placeholder' => 'Zvoľte výdajne miesto',
+                        ),
+                        WC()->checkout->get_value( 'glsparcelshop_name' )
+                    );
 				} else {
 					$parcelshops = $this->api->get_gls_parcel_shops();
+                    woocommerce_form_field(
+                        'glsparcelshop_id',
+                        array(
+                            'type'     => 'select',
+                            'class'    => array( 'form-row-wide carrier-name' ),
+                            'required' => true,
+                            'placeholder' => 'Zvolte vydajne miesto',
+                            'options'  => $parcelshops,
+                        ),
+                        WC()->checkout->get_value( 'glsparcelshop_id' )
+                    );
 				}
-				echo '<div class="parcelshop-carrier">';
-				woocommerce_form_field(
-					'glsparcelshop_id',
-					array(
-						'type'     => 'select',
-						'class'    => array( 'form-row-wide carrier-name' ),
-						'required' => true,
-						'options'  => $parcelshops,
-					),
-					WC()->checkout->get_value( 'glsparcelshop_id' )
-				);
 				echo '</div>';
 			}
 		}
+
+        $customer_carrier_method = 'neoship_packeta';
+
+        if ( $method->method_id === $customer_carrier_method ) { // Packeta
+            $chosen_method_id = WC()->session->chosen_shipping_methods[ $index ];
+            if ( substr($chosen_method_id, 0, strlen($customer_carrier_method) ) == $customer_carrier_method ) {
+                if ( $this->v3 ) {
+                    echo '<div class="parcelshop-packeta">';
+                    woocommerce_form_field(
+                        'packeta_id',
+                        array(
+                            'type'     => 'text',
+                            'class'    => array( 'form-row-wide' ),
+                            'required' => true,
+                        ),
+                        WC()->checkout->get_value( 'packeta_id' )
+                    );
+                    woocommerce_form_field(
+                        'packeta_name',
+                        array(
+                            'type'     => 'text',
+                            'class'    => array( 'form-row-wide carrier-name' ),
+                            'required' => true,
+                            'placeholder' => 'Zvoľte výdajne miesto',
+                        ),
+                        WC()->checkout->get_value( 'packeta_name' )
+                    );
+                    echo '</div>';
+                }
+            }
+        }
 
 	}
 
@@ -201,43 +281,66 @@ class Neoship_Public {
 	 * @since 1.0.0
 	 */
 	public function check_checkout() {
-		if ( isset( $_POST['parcelshop_id'] ) && false !== wp_verify_nonce( wp_unslash( $sanitized_id ) ) && empty( $_POST['parcelshop_id'] ) ) {
+
+		if ( isset( $_POST['parcelshop_id'] ) && empty( $_POST['parcelshop_id'] ) ) {
 			wc_add_notice( ( __( 'Please fill parcelshop', 'neoship' ) ), 'error' );
-		} elseif ( isset( $_POST['parcelshop_id'] ) && false !== wp_verify_nonce( wp_unslash( $sanitized_id ) ) ) {
-			$sanitized_id = intval( $_POST['parcelshop_id'] );
-			$found_parcelshop = false;
-			if ( $this->v3 ) {
-				$parcelshop = $this->api->get_parcel_shop( $sanitized_id );
-				if ( $parcelshop ) {
-					$found_parcelshop = true;
-				}
-			} else {
-				$parcelshops  	  = $this->api->get_parcel_shops();
-				$found_parcelshop = array_key_exists( $sanitized_id, $parcelshops );
-			}
-			if ( ! $found_parcelshop ) {
-				wc_add_notice( ( __( 'Choose correct parcelshop', 'neoship' ) ), 'error' );
-			}
+		} elseif ( !empty( $_POST['parcelshop_id'] ) ) {
+            $sanitized_id = intval( $_POST['parcelshop_id'] );
+            if (false !== wp_verify_nonce( wp_unslash( $sanitized_id ) )) {
+                $found_parcelshop = false;
+                if ($this->v3) {
+                    $parcelshop = $this->api->get_parcel_shop($sanitized_id);
+                    if ($parcelshop) {
+                        $found_parcelshop = true;
+                    }
+                } else {
+                    $parcelshops = $this->api->get_parcel_shops();
+                    $found_parcelshop = array_key_exists($sanitized_id, $parcelshops);
+                }
+                if (!$found_parcelshop) {
+                    wc_add_notice((__('Choose correct parcelshop', 'neoship')), 'error');
+                }
+            }
 		}
 
-		if ( isset( $_POST['glsparcelshop_id'] ) && false !== wp_verify_nonce( wp_unslash( $sanitized_id ) ) && empty( $_POST['glsparcelshop_id'] ) ) {
+		if ( isset( $_POST['glsparcelshop_id'] ) && empty( $_POST['glsparcelshop_id'] ) ) {
 			wc_add_notice( ( __( 'Please fill parcelshop', 'neoship' ) ), 'error' );
-		} elseif ( isset( $_POST['glsparcelshop_id'] ) && false !== wp_verify_nonce( wp_unslash( $sanitized_id ) ) ) {
-			$sanitized_id = intval( $_POST['parcelshop_id'] );
-			$found_parcelshop = false;
-			if ( $this->v3 ) {
-				$parcelshop = $this->api->get_parcel_shop( $sanitized_id );
-				if ( $parcelshop ) {
-					$found_parcelshop = true;
-				}
-			} else {
-				$parcelshops  	  = $this->api->get_gls_parcel_shops();
-				$found_parcelshop = array_key_exists( $sanitized_id, $parcelshops );
-			}
-			if ( ! $found_parcelshop ) {
-				wc_add_notice( ( __( 'Choose correct parcelshop', 'neoship' ) ), 'error' );
-			}
+		} elseif ( !empty( $_POST['glsparcelshop_id']  ) ) {
+			$sanitized_id = intval( $_POST['glsparcelshop_id'] );
+            if (false !== wp_verify_nonce( wp_unslash( $sanitized_id ) )) {
+                $found_parcelshop = false;
+                if ($this->v3) {
+                    $parcelshop = $this->api->get_parcel_shop($sanitized_id);
+                    if ($parcelshop) {
+                        $found_parcelshop = true;
+                    }
+                } else {
+                    $parcelshops = $this->api->get_gls_parcel_shops();
+                    $found_parcelshop = array_key_exists($sanitized_id, $parcelshops);
+                }
+                if (!$found_parcelshop) {
+                    wc_add_notice((__('Choose correct parcelshop', 'neoship')), 'error');
+                }
+            }
 		}
+
+        if ( isset( $_POST['packeta_id'] ) && empty( $_POST['packeta_id'] ) ) {
+            wc_add_notice( ( __( 'Please fill parcelshop', 'neoship' ) ), 'error' );
+        } elseif ( !empty( $_POST['packeta_id']  ) ) {
+            $sanitized_id = intval( $_POST['packeta_id'] );
+            if (false !== wp_verify_nonce( wp_unslash( $sanitized_id ) )) {
+                $found_parcelshop = false;
+                if ($this->v3) {
+                    $parcelshop = $this->api->get_parcel_shop($sanitized_id);
+                    if ($parcelshop) {
+                        $found_parcelshop = true;
+                    }
+                }
+                if (!$found_parcelshop) {
+                    wc_add_notice((__('Choose correct parcelshop', 'neoship')), 'error');
+                }
+            }
+        }
 	}
 
 	/**
@@ -248,6 +351,7 @@ class Neoship_Public {
 	 * @param int $order_id Id of order.
 	 */
 	public function update_carriers( $order_id ) {
+
 		if ( $this->v3 ) {
 			$sanitized_id = null;
 			if ( isset( $_POST['parcelshop_id'] ) ) {
@@ -256,6 +360,9 @@ class Neoship_Public {
 			if ( isset( $_POST['glsparcelshop_id'] ) ) {
 				$sanitized_id = intval( $_POST['glsparcelshop_id'] );
 			}
+            if ( isset( $_POST['packeta_id'] ) ) {
+                $sanitized_id = intval( $_POST['packeta_id'] );
+            }
 			$parcelshop = $this->api->get_parcel_shop( $sanitized_id );
 			update_post_meta( $order_id, '_parcelshop_id', $parcelshop['parcelshop_id'] );
 		} else {
@@ -287,6 +394,9 @@ class Neoship_Public {
 			if ( isset( $_POST['glsparcelshop_id'] ) ) {
 				$sanitized_id = intval( $_POST['glsparcelshop_id'] );
 			}
+            if ( isset( $_POST['packeta_id'] ) ) {
+                $sanitized_id = intval( $_POST['packeta_id'] );
+            }
 
 			if ( $sanitized_id ) {
 				if ( false !== wp_verify_nonce( wp_unslash( $sanitized_id ) ) ) {

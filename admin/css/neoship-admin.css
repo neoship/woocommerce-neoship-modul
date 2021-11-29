@@ -32,11 +32,18 @@
 	display: none;
 }
 
-.neoship-gls .sps-logo{
+.neoship-gls .sps-logo,
+.neoship-gls .packeta-logo{
 	display: none;
 }
 
-.neoship-sps .gls-logo{
+.neoship-sps .gls-logo,
+.neoship-sps .packeta-logo{
+	display: none;
+}
+
+.neoship-packeta .sps-logo,
+.neoship-packeta .gls-logo{
 	display: none;
 }
 

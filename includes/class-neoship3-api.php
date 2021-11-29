@@ -97,13 +97,20 @@ class Neoship3_Api {
 		update_option( 'neoship_login', $this->login_data );
 
 		$has_gls = false;
+        $has_packeta = false;
 		foreach ( $user['user_shipper_price_lists'] as $value ) {
 			if ( 'GLS' === $value['shipper']['shortcut'] ) {
 				$has_gls = true;
 				break;
 			}
+            if ( 'Packeta' === $value['shipper']['shortcut'] ) {
+                $has_packeta = true;
+                break;
+            }
 		}
+
 		update_option( 'neoship_has_gls', $has_gls );
+		update_option( 'neoship_has_packeta', $has_packeta );
 	}
 
 	/**
