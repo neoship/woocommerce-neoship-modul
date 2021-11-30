@@ -101,7 +101,7 @@ class Neoship3_Api {
 		foreach ( $user['user_shipper_price_lists'] as $value ) {
 			if ( 'GLS' === $value['shipper']['shortcut'] ) {
 				$has_gls = true;
-				break;
+                continue;
 			}
             if ( 'Packeta' === $value['shipper']['shortcut'] ) {
                 $has_packeta = true;
