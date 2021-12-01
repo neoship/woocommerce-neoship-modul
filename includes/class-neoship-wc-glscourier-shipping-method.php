@@ -33,8 +33,8 @@ class Neoship_WC_GlsCourier_Shipping_Method extends Neoship_WC_Shipping {
 	public function __construct( $instance_id = 0 ) {
 		parent::__construct( $instance_id );
 		$this->id           = 'neoship_glscourier';
-		$this->method_title = __( 'Gls Courier', 'neoship' );
-		$this->title        = __( 'Gls Courier', 'neoship' );
+		$this->method_title = __( 'Gls Kuriér', 'neoship' );
+		$this->title        = __( 'Gls Kuriér', 'neoship' );
 		$this->init();
 	}
 

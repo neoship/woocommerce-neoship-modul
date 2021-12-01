@@ -33,8 +33,8 @@ class Neoship_WC_SpsCourier_Shipping_Method extends Neoship_WC_Shipping {
 	public function __construct( $instance_id = 0 ) {
 		parent::__construct( $instance_id );
 		$this->id           = 'neoship_spscourier';
-		$this->method_title = __( 'SPS Courier', 'neoship' );
-		$this->title        = __( 'SPS Courier', 'neoship' );
+		$this->method_title = __( 'SPS Kuriér', 'neoship' );
+		$this->title        = __( 'SPS Kuriér', 'neoship' );
 		$this->init();
 	}
 

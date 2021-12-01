@@ -1243,7 +1243,7 @@ class Neoship_Admin {
 											</div>
 				<?php } elseif ( '' !== $parcelshop_id ) { ?>
                                     <?php if ( $carrier == 'sps' && strpos($order['shipping']['company'], 'Alzabox') !== false ) { ?>
-                                        <strong>Parcelshop - Alzabox </strong> (vymažte dobierku)
+                                        <strong>Parcelshop - Alzabox </strong> <span style="color:red;">(vymažte dobierku)</span>
                                     <?php } else  { ?>
                                         <strong>Parcelshop</strong>
                                     <?php } ?>

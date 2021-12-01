@@ -12,7 +12,7 @@ $settings = array(
 		'title'       => __( 'Title', 'woocommerce' ),
 		'type'        => 'text',
 		'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-		'default'     => __( 'Gls Courier', 'neoship' ),
+		'default'     => __( 'VAS NAZOV PREPRAVCU', 'neoship' ),
 		'desc_tip'    => true,
 	),
 	'tax_status' => array(
