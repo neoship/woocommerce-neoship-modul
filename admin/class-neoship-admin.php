@@ -1082,8 +1082,8 @@ class Neoship_Admin {
 					"receiver_city" => $order['shipping']['city'],
 					"receiver_zip" => $order['shipping']['postcode'],
 					"receiver_state_code" => $order['shipping']['country'],
-					"receiver_email" => $order['billing']['email'],
-					"receiver_phone" => $order['billing']['phone'],
+					"receiver_email" => !empty($order['shipping']['email']) ? $order['shipping']['email'] : $order['billing']['email'],
+					"receiver_phone" => !empty($order['shipping']['phone']) ? $order['shipping']['phone'] : $order['billing']['phone'],
 
 
 					"cod_price" => in_array( $order['payment_method'], [ 'cod', 'dobirka' ] ) ? sanitize_text_field( $pkg['cod'] ) : null,
