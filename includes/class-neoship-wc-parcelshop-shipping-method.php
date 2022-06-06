@@ -33,8 +33,8 @@ class Neoship_WC_Parcelshop_Shipping_Method extends Neoship_WC_Shipping {
 	public function __construct( $instance_id = 0 ) {
 		parent::__construct( $instance_id );
 		$this->id           = 'parcelshop';
-		$this->method_title = __( 'Parcelshop', 'neoship' );
-		$this->title        = __( 'Parcelshop', 'neoship' );
+		$this->method_title = __( 'SPS Parcelshop', 'neoship' );
+		$this->title        = __( 'SPS Parcelshop', 'neoship' );
 		$this->init();
 	}
 }

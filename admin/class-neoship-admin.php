@@ -91,6 +91,15 @@ class Neoship_Admin {
      */
     private $packeta_shipping_methods;
 
+    /**
+     * NeoshipApi
+     *
+     * @since  2.0.0
+     * @access private
+     * @var    array    $K123_shipping_methods    Array of 123 couriers.
+     */
+    private $k123_shipping_methods;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -107,6 +116,7 @@ class Neoship_Admin {
 		$this->api         			= $this->v3 ? new Neoship3_Api() : new Neoship_Api();
 		$this->gls_shipping_methods = [ 'neoship_glscourier', 'neoship_glsparcelshop' ];
 		$this->packeta_shipping_methods = [ 'neoship_packeta' ];
+		$this->k123_shipping_methods = [ 'neoship_123' ];
 
 	}
 
@@ -309,7 +319,7 @@ class Neoship_Admin {
 	 * @param array $actions Default actions.
 	 */
 	public function neoship_order_list_bulk_actions( $actions ) {
-		$actions['neoship_acceptance_protocol']          = __( 'Acceptance protocol', 'neoship' );
+		$actions['neoship_acceptance_protocol']          = __( 'Preberací protokol SPS', 'neoship' );
 		$actions['neoship_export']                       = __( 'Export to Neoship', 'neoship' ) . ' (' . $this->api->get_user_credit() . '€)';
 
 		if ( ! $this->v3 ) {
@@ -326,6 +336,10 @@ class Neoship_Admin {
             }
             if ( get_option( 'neoship_has_packeta' ) ) {
                 $actions['neoship3_print_stickers_packeta'] = __( 'Tlač štítkov Packeta (PDF)', 'neoship' );
+            }
+            if ( get_option( 'neoship_has_123' ) ) {
+                $actions['neoship3_print_stickers_123'] = __( 'Tlač štítkov 123 kuriér (PDF)', 'neoship' );
+                $actions['neoship3_acceptance_protocol_123']          = __( 'Preberací protokol 123 kuriér', 'neoship' );
             }
         }
 
@@ -398,6 +412,11 @@ class Neoship_Admin {
             'neoship3_print_stickers_packeta_position_2',
             'neoship3_print_stickers_packeta_position_3',
             'neoship3_print_stickers_packeta_position_4',
+            'neoship3_print_stickers_123',
+            'neoship3_print_stickers_123_position_1',
+            'neoship3_print_stickers_123_position_2',
+            'neoship3_print_stickers_123_position_3',
+            'neoship3_print_stickers_123_position_4',
 		);
 
 		if ( ! in_array( $action, $allowed_values, true ) ) {
@@ -417,8 +436,9 @@ class Neoship_Admin {
 
         if ( $this->v3 ) {
             //VERSION NEOSHIP3 SEPARATELLY FOR ALL SHIPPERS ONE BY ONE
-            $position = (int)filter_var($action, FILTER_SANITIZE_NUMBER_INT);
-            $sticker_position = $position ? $position - 30 : '1';
+//            $position = (int)filter_var($action, FILTER_SANITIZE_NUMBER_INT);
+            $position = (int)explode('_',$action)[5];
+            $sticker_position = $position ? $position : '1';
 
             $carrier = explode("_" , $action)[3];
 
@@ -431,6 +451,8 @@ class Neoship_Admin {
                     $shipping_method = 'gls';
                 } elseif (in_array( $shipping_info['method_id'], $this->packeta_shipping_methods )){
                     $shipping_method = 'packeta';
+                } elseif (in_array( $shipping_info['method_id'], $this->k123_shipping_methods )) {
+                    $shipping_method = '123';
                 } else {
                     $shipping_method = 'sps';
                 }
@@ -501,15 +523,21 @@ class Neoship_Admin {
 	 */
 	public function handle_bulk_action_print_acceptance_protocol( $redirect_to, $action, $posts_ids ) {
 
-		if ( 'neoship_acceptance_protocol' !== $action ) {
-			return $redirect_to;
-		}
+
+        $allowed_values = array(
+            'neoship_acceptance_protocol',
+            'neoship3_acceptance_protocol_123'
+        );
+
+        if ( ! in_array( $action, $allowed_values, true ) ) {
+            return $redirect_to;
+        }
 
 		if ( $this->v3 ) {
 
 			$location = add_query_arg(
 				array(
-					'neoship3_acceptance_protocol' => 1,
+                    'neoship3_acceptance_protocol' => ($action == 'neoship3_acceptance_protocol_123')  ? '123' : 'SPS',
 					'_wpnonce'       			   => wp_create_nonce( 'neoship_notice_nonce' ),
 				),
 				admin_url( 'edit.php?post_type=shop_order' )
@@ -539,8 +567,8 @@ class Neoship_Admin {
 		
 		if ( ! empty( $_REQUEST['neoship3_acceptance_protocol'] ) && ! empty( $_REQUEST['_wpnonce'] ) ) {
 			if ( false !== wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'neoship_notice_nonce' ) ) {
-				
-				$protocol = $this->api->print_acceptance_protocol();
+
+				$protocol = $this->api->print_acceptance_protocol($_REQUEST['neoship3_acceptance_protocol']);
 
 				if ( ! empty( $protocol['errors'] ) ) {
 					echo '<div class="notice notice-error is-dismissible"><p>';
@@ -574,12 +602,17 @@ class Neoship_Admin {
 			if ( false !== wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'neoship_notice_nonce' ) ) {
 				
 				if ( $this->v3 ) {
-					$labels_errors = $this->api->print_sticker( $_REQUEST['reference_numbers'], intval( $_REQUEST['position'] ) );
-
+                    $labels_errors = $this->api->print_sticker( $_REQUEST['reference_numbers'], intval( $_REQUEST['position'] ) );
 					$tmp_errors = [];
-					foreach ($labels_errors['errors'] as $value) {
-						$tmp_errors[ $value['reference_number'] ] = implode( ',', $value['errors'] );
-					}
+                    if (is_array($labels_errors['errors'])) {
+                        foreach ($labels_errors['errors'] as $value) {
+                            if (isset($value['errors'])){
+                                $tmp_errors[ $value['reference_number'] ] = implode( ',', $value['errors'] );
+                            }
+                        }
+                    } else {
+                        $tmp_errors[] = $labels_errors['errors'];
+                    }
 					$labels_errors['errors'] = $tmp_errors;
 				} else {
 					$labels_errors = $this->api->print_sticker_gls( $_REQUEST['reference_numbers'], intval( $_REQUEST['position'] ) );
@@ -979,7 +1012,7 @@ class Neoship_Admin {
 						<div class="tablenav bottom">
 							<div class="alignright actions">
 								<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=shop_order' ) ); ?>" class="button action"><?php esc_html_e( 'Back' ); ?></a>
-								<button type="submit" class="button action"><?php esc_html_e( 'Export', 'neoship' ); ?></buttpn>
+								<button type="submit" class="button action"><?php esc_html_e( 'Export', 'neoship' ); ?></button>
 							</div>
 						</div>
 					</form>
@@ -1006,6 +1039,9 @@ class Neoship_Admin {
         if ( get_option( 'neoship_has_packeta' ) ) {
             include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-neoship-wc-packeta-shipping-method.php';
         }
+        if ( get_option( 'neoship_has_123' ) ) {
+            include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-neoship-wc-123-shipping-method.php';
+        }
 	}
 
 	/**
@@ -1025,6 +1061,9 @@ class Neoship_Admin {
 		}
         if ( get_option( 'neoship_has_packeta' ) ) {
             $methods['neoship_packeta'] = 'Neoship_WC_Packeta_Shipping_Method';
+        }
+        if ( get_option( 'neoship_has_123' ) ) {
+            $methods['neoship_123'] = 'Neoship_WC_123_Shipping_Method';
         }
 		return $methods;
 	}
@@ -1046,6 +1085,7 @@ class Neoship_Admin {
 			$sps_packages 			= array();
 			$gls_packages 			= array();
 			$packeta_packages 		= array();
+			$k123_packages 		    = array();
 
 			foreach ( $_POST['packages'] as $pkg ) {
 				$order_obj      = wc_get_order( intval( $pkg['id'] ) );
@@ -1056,6 +1096,8 @@ class Neoship_Admin {
                     $carrier = 'gls';
                 } elseif (in_array( $shipping_info['method_id'], $this->packeta_shipping_methods )){
                     $carrier = 'packeta';
+                } elseif (in_array( $shipping_info['method_id'], $this->k123_shipping_methods )){
+                    $carrier = '123';
                 } else {
                     $carrier = 'sps';
                 }
@@ -1112,6 +1154,9 @@ class Neoship_Admin {
                     case 'sps':
                         $sps_packages[] = $package;
                         break;
+                    case '123':
+                        $k123_packages[] = $package;
+                        break;
                     default :
                         echo 'Carrier not defined!';
                 }
@@ -1126,6 +1171,9 @@ class Neoship_Admin {
             }
             if ( count( $packeta_packages ) ) {
                 $response[] = $this->api->create_packages( $packeta_packages, 3 ) ;//packeta shipper id '3'
+            }
+            if ( count( $k123_packages ) ) {
+                $response[] = $this->api->create_packages( $k123_packages, 4 ) ;//123 kurier shipper id '4'
             }
 
             $success = [];
@@ -1216,6 +1264,8 @@ class Neoship_Admin {
                     $carrier = 'gls';
                 } else if (in_array( $shipping_info['method_id'], $this->packeta_shipping_methods )) {
                     $carrier = 'packeta';
+                } else if (in_array( $shipping_info['method_id'], $this->k123_shipping_methods )) {
+                    $carrier = '123';
                 }
 
                 ?>
@@ -1224,10 +1274,12 @@ class Neoship_Admin {
 											<img src="<?php echo plugins_url( '/../public/images/sps-logo.png', __FILE__ ) ?>" alt="sps-logo" class="sps-logo">
 											<img src="<?php echo plugins_url( '/../public/images/gls-logo.png', __FILE__ ) ?>" alt="gls-logo" class="gls-logo">
 											<img src="<?php echo plugins_url( '/../public/images/packeta-logo.png', __FILE__ ) ?>" alt="packeta-logo" class="packeta-logo">
+											<img src="<?php echo plugins_url( '/../public/images/123kurier-logo.png', __FILE__ ) ?>" alt="123-logo" class="k123-logo">
 				<?php if ( '' === $parcelshop_id ) { ?>
 											<select class="neoship-shipper-change" name="packages[<?php echo esc_html( $index ); ?>][shipper]" data-rowid="#neoship-export-row-<?php echo $index ?>">
 												<option value="sps" <?php echo $carrier == 'sps' ? 'selected' : '' ?>>SPS</option>
 												<option value="gls" <?php echo $carrier == 'gls' ? 'selected' : '' ?>>GLS</option>
+												<option value="123" <?php echo $carrier == '123' ? 'selected' : '' ?>>123</option>
 											</select>
 				<?php } ?>
 										</td>
@@ -1273,7 +1325,7 @@ class Neoship_Admin {
 						<div class="tablenav bottom">
 							<div class="alignright actions">
 								<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=shop_order' ) ); ?>" class="button action"><?php esc_html_e( 'Back' ); ?></a>
-								<button type="submit" class="button action"><?php esc_html_e( 'Export', 'neoship' ); ?></buttpn>
+								<button type="submit" class="button action"><?php esc_html_e( 'Export', 'neoship' ); ?></button>
 							</div>
 						</div>
 					</form>

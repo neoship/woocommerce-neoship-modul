@@ -98,6 +98,7 @@ class Neoship3_Api {
 
 		$has_gls = false;
         $has_packeta = false;
+        $has_123 = false;
 		foreach ( $user['user_shipper_price_lists'] as $value ) {
 			if ( 'GLS' === $value['shipper']['shortcut'] ) {
 				$has_gls = true;
@@ -105,10 +106,14 @@ class Neoship3_Api {
             if ( 'Packeta' === $value['shipper']['shortcut'] ) {
                 $has_packeta = true;
             }
+            if ( '123' === $value['shipper']['shortcut'] ) {
+                $has_123 = true;
+            }
 		}
 
 		update_option( 'neoship_has_gls', $has_gls );
 		update_option( 'neoship_has_packeta', $has_packeta );
+		update_option( 'neoship_has_123', $has_123 );
 	}
 
 	/**
@@ -206,22 +211,34 @@ class Neoship3_Api {
 	 * @access public
 	 *
 	 */
-	public function print_acceptance_protocol() {
+	public function print_acceptance_protocol($action) {
 		if ( false === $this->access_data ) {
 			$this->login();
 		}
 
 		$url  = NEOSHIP3_API_URL . '/package/bulk/';
-		$args = [
-			'headers' => $this->get_headers(),
-			'body' => json_encode([
-				'action' => 'daily_closing',
-			])
-		];
+        if ($action == '123') {
+            $date = new DateTime('now');
+            $args = [
+                'headers' => $this->get_headers(),
+                'body' => json_encode([
+                    'action' => 'k123_acceptance_protocol',
+                    'date' => $date->format('Y-m-d')
+                ])
+            ];
+        } else {
+            $args = [
+                'headers' => $this->get_headers(),
+                'body' => json_encode([
+                    'action' => 'daily_closing',
+                ])
+            ];
+        }
 
 		$response = wp_remote_post( $url, $args );
 		return json_decode( wp_remote_retrieve_body( $response ), true );
 	}
+
 
 	/**
 	 * Get parcelshops.

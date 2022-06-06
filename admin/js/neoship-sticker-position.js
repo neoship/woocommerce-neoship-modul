@@ -75,7 +75,7 @@
                 for (let index = 0; index < menusIds.length; index++) {
                     var actionSelectMenu = document.getElementById( menusIds[index] );
                     if ( [ 'neoship_print_stickers', 'neoship_print_stickers_gls',
-                        'neoship3_print_stickers_sps', 'neoship3_print_stickers_gls', 'neoship3_print_stickers_packeta' ].includes( actionSelectMenu.value ) ) {
+                        'neoship3_print_stickers_sps', 'neoship3_print_stickers_gls', 'neoship3_print_stickers_packeta' , 'neoship3_print_stickers_123'].includes( actionSelectMenu.value ) ) {
                         event.preventDefault();
                         modal.style.display = 'block';
                     }
