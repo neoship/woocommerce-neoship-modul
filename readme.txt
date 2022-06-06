@@ -4,7 +4,7 @@ Donate link: https://neoship.sk/
 Tags: neoship, shipping
 Requires at least: 4.9
 Tested up to: 5.8
-Stable tag: 3.1.2
+Stable tag: 3.2
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -105,6 +105,9 @@ Fill the form on [https://info.neoship.sk/sk/kontakt](https://info.neoship.sk/sk
 
 = 3.1.1 =
 * Fixed break in indexes of shipper
+
+= 3.2 =
+* Added shipper 123 kurier
 
 == Upgrade Notice ==
 
