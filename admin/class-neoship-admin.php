@@ -604,14 +604,16 @@ class Neoship_Admin {
 				if ( $this->v3 ) {
                     $labels_errors = $this->api->print_sticker( $_REQUEST['reference_numbers'], intval( $_REQUEST['position'] ) );
 					$tmp_errors = [];
-                    if (is_array($labels_errors['errors'])) {
-                        foreach ($labels_errors['errors'] as $value) {
-                            if (isset($value['errors'])){
-                                $tmp_errors[ $value['reference_number'] ] = implode( ',', $value['errors'] );
+                    if (array_key_exists('errors', $labels_errors)){
+                        if (is_array($labels_errors['errors'])) {
+                            foreach ($labels_errors['errors'] as $value) {
+                                if (isset($value['errors'])){
+                                    $tmp_errors[ $value['reference_number'] ] = implode( ',', $value['errors'] );
+                                }
                             }
+                        } else {
+                            $tmp_errors[] = $labels_errors['errors'];
                         }
-                    } else {
-                        $tmp_errors[] = $labels_errors['errors'];
                     }
 					$labels_errors['errors'] = $tmp_errors;
 				} else {
