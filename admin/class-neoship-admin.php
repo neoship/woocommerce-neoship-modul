@@ -626,8 +626,20 @@ class Neoship_Admin {
 					]
 				] : $labels_errors;
 
+				$printed_labels = array_key_exists('tracking', $labels_errors) ? $labels_errors['tracking'] : [];
+				if (count($_REQUEST['reference_numbers']) > count($printed_labels)){
+				    $printed_refs = array_map(function($a){return $a['reference_number'];}, $printed_labels);
+				    $diff = array_filter($_REQUEST['reference_numbers'], function($rr) use($printed_refs) {return !in_array($rr, $printed_refs);});
+                    echo '<div class="notice notice-error is-dismissible">';
+                    $message = sprintf( _n( '%d label was not printed. Check if it is printed already', '%d labels were not printed. Check if they are printed already', count($diff), 'neoship' ), count($diff) );
+                    echo '<strong>';
+                    echo esc_html( $message );
+                    echo '</strong>: ' . esc_html(implode(', ', $diff));
+                    echo '</div>';
+                }
+
 				if ( count( $labels_errors['errors'] ) > 0 ) {
-					echo '<div class="notice notice-error is-dismissible"><p>';
+					echo '<div class="notice notice-error is-dismissible">';
 
 					foreach ( $labels_errors['errors'] as $key => $value ) {
 						$value = is_array( $value ) ? implode( ', ', $value ) : $value;
