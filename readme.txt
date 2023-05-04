@@ -4,8 +4,8 @@ Contributors: neoship
 Donate link: https://neoship.sk/
 Tags: neoship, shipping
 Requires at least: 4.9
-Tested up to: 5.8
-Stable tag: 3.3.0
+Tested up to: 6.2
+Stable tag: 3.3.2
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -120,6 +120,12 @@ Fill the form on [https://neoship.sk/sk/kontakt](https://neoship.sk/sk/kontakt?u
 * Removed old neoship api compatibility
 * Refactored actual api calls
 * added DPD courier and DPD parcelshops
+
+= 3.3.1 =
+* Translations fixed
+
+= 3.3.2 =
+* Upgrade broken
 
 == Upgrade Notice ==
 
