@@ -220,7 +220,7 @@ class Neoship_Admin {
 
 		add_settings_field(
 			'clientid',
-			esc_html_e( 'Username', 'neoship' ),
+			__( 'Username', 'neoship' ),
 			array( $this, 'neoship_settings_id_callback' ),
 			'neoship-settings',
 			'neoship-settings-section'
@@ -228,7 +228,7 @@ class Neoship_Admin {
 
 		add_settings_field(
 			'clientsecret',
-			esc_html_e( 'Password', 'neoship' ),
+			__( 'Password', 'neoship' ),
 			array( $this, 'neoship_settings_secret_callback' ),
 			'neoship-settings',
 			'neoship-settings-section'
