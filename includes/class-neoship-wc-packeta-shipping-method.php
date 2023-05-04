@@ -2,7 +2,7 @@
 /**
  * File define gls parcelshop shipping method.
  *
- * @link  https://info.neoship.sk
+ * @link  https://neoship.sk
  * @since 2.0.0
  *
  * @package    Neoship
@@ -21,7 +21,7 @@ require_once __DIR__ . '/class-neoship-wc-shipipng-class.php';
  * @since      2.0.0
  * @package    Neoship
  * @subpackage Neoship/includes
- * @author     info.neoship.sk
+ * @author     IT <it@neoship.sk>
  */
 class Neoship_WC_Packeta_Shipping_Method extends Neoship_WC_Shipping {
 

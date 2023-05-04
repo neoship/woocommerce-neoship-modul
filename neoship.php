@@ -7,7 +7,7 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link    https://www.kuskosoft.com
+ * @link    https://www.neoship.sk
  * @since   1.0.0
  * @package Neoship
  *
@@ -17,14 +17,14 @@
  * Description:       Export orders to neoship
  * Version:           3.0.0
  * Author:            Neoship
- * Author URI:        https://www.kuskosoft.com
+ * Author URI:        https://www.neoship.sk
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       neoship
  * Domain Path:       /languages
  *
  * WC requires at least: 3.3
- * WC tested up to: 4.5
+ * WC tested up to: 6.2
  *
  * Copyright: © 2009-2015 WooCommerce.
  * License: GNU General Public License v3.0

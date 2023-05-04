@@ -2,7 +2,7 @@
 /**
  * File define gls courier shipping method.
  *
- * @link  https://www.kuskosoft.com
+ * @link  https://www.neoship.sk
  * @since 2.0.0
  *
  * @package    Neoship
@@ -14,12 +14,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * This is used to define gls courier shipping method.
+ * This is used to define courier shipping method.
  *
  * @since      2.0.0
  * @package    Neoship
  * @subpackage Neoship/includes
- * @author     Mirec <hutar@kuskosoft.com>
+ * @author     IT <it@neoship.sk>
  */
 class Neoship_WC_Shipping extends WC_Shipping_Method {
 

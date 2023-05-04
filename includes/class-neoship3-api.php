@@ -4,7 +4,7 @@
  *
  * A class definition that includes attributes and functions used to communication with neoship api
  *
- * @link  https://www.kuskosoft.com
+ * @link  https://www.neoship.sk
  * @since 3.0.0
  *
  * @package    Neoship
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since      3.0.0
  * @package    Neoship
  * @subpackage Neoship/includes
- * @author     Mirec <hutar@kuskosoft.com>
+ * @author     IT <it@neoship.sk>
  */
 class Neoship3_Api {
 
@@ -99,6 +99,7 @@ class Neoship3_Api {
 		$has_gls = false;
         $has_packeta = false;
         $has_123 = false;
+        $has_dpd = false;
 		foreach ( $user['user_shipper_price_lists'] as $value ) {
 			if ( 'GLS' === $value['shipper']['shortcut'] ) {
 				$has_gls = true;
@@ -109,11 +110,15 @@ class Neoship3_Api {
             if ( '123' === $value['shipper']['shortcut'] ) {
                 $has_123 = true;
             }
+			if ( 'DPD' === $value['shipper']['shortcut'] ) {
+				$has_dpd = true;
+			}
 		}
 
 		update_option( 'neoship_has_gls', $has_gls );
 		update_option( 'neoship_has_packeta', $has_packeta );
 		update_option( 'neoship_has_123', $has_123 );
+		update_option( 'neoship_has_dpd', $has_dpd );
 	}
 
 	/**

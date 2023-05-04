@@ -5,7 +5,7 @@ Donate link: https://neoship.sk/
 Tags: neoship, shipping
 Requires at least: 4.9
 Tested up to: 5.8
-Stable tag: 3.2.2
+Stable tag: 3.3.0
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -35,11 +35,11 @@ Features:
 
 = What is Neoship? =
 
-Neoship is expedition system. It allows make shipment more efficient by connecting to e-shops, carriers and billing systems. Customer can bulk process orders from e-shop, match cash on delivery invoices, communicate effectively with carrier, resolve claims and adjust appearance and content of notification e-mails with package tracking. Find more information on [https://info.neoship.sk](https://info.neoship.sk)
+Neoship is expedition system. It allows make shipment more efficient by connecting to e-shops, carriers and billing systems. Customer can bulk process orders from e-shop, match cash on delivery invoices, communicate effectively with carrier, resolve claims and adjust appearance and content of notification e-mails with package tracking. Find more information on [https://neoship.sk](https://neoship.sk)
 
 = How to become Neoship customer? =
 
-Fill the form on [https://info.neoship.sk/sk/kontakt](https://info.neoship.sk/sk/kontakt?utm_source=wordpress&utm_medium=plugin&utm_campaign=woocommerce) or send an e-mail to [info@neoship.sk](mailto:info@neoship.sk).
+Fill the form on [https://neoship.sk/sk/kontakt](https://neoship.sk/sk/kontakt?utm_source=wordpress&utm_medium=plugin&utm_campaign=woocommerce) or send an e-mail to [info@neoship.sk](mailto:info@neoship.sk).
 
 
 == Screenshots ==
@@ -115,6 +115,11 @@ Fill the form on [https://info.neoship.sk/sk/kontakt](https://info.neoship.sk/sk
 
 = 3.2.2 =
 * Display error message if some labels were not printed
+
+= 3.3.0 =
+* Removed old neoship api compatibility
+* Refactored actual api calls
+* added DPD courier and DPD parcelshops
 
 == Upgrade Notice ==
 

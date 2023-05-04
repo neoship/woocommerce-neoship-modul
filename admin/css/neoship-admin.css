@@ -34,28 +34,40 @@
 
 .neoship-gls .sps-logo,
 .neoship-gls .packeta-logo,
-.neoship-gls .k123-logo
+.neoship-gls .k123-logo,
+.neoship-gls .dpd-logo
 {
 	display: none;
 }
 
 .neoship-sps .gls-logo,
 .neoship-sps .packeta-logo,
-.neoship-sps .k123-logo
+.neoship-sps .k123-logo,
+.neoship-sps .dpd-logo
 {
 	display: none;
 }
 
 .neoship-packeta .sps-logo,
 .neoship-packeta .gls-logo,
-.neoship-packeta .k123-logo
+.neoship-packeta .k123-logo,
+.neoship-packeta .dpd-logo
 {
 	display: none;
 }
 
 .neoship-123 .sps-logo,
 .neoship-123 .gls-logo,
-.neoship-123 .packeta-logo
+.neoship-123 .packeta-logo,
+.neoship-123 .dpd-logo
+{
+	display: none;
+}
+
+.neoship-dpd .sps-logo,
+.neoship-dpd .gls-logo,
+.neoship-dpd .packeta-logo,
+.neoship-dpd .k123-logo
 {
 	display: none;
 }

@@ -23,7 +23,7 @@ require_once __DIR__ . '/class-neoship-wc-shipipng-class.php';
  * @subpackage Neoship/includes
  * @author     IT <it@neoship.sk>
  */
-class Neoship_WC_GlsParcelshop_Shipping_Method extends Neoship_WC_Shipping {
+class Neoship_WC_DpdParcelshop_Shipping_Method extends Neoship_WC_Shipping {
 
 	/**
 	 * Constructor.
@@ -32,9 +32,9 @@ class Neoship_WC_GlsParcelshop_Shipping_Method extends Neoship_WC_Shipping {
 	 */
 	public function __construct( $instance_id = 0 ) {
 		parent::__construct( $instance_id );
-		$this->id           = 'neoship_glsparcelshop';
-		$this->method_title = __( 'Gls Parcelshop', 'neoship' );
-		$this->title        = __( 'Gls Parcelshop', 'neoship' );
+		$this->id           = 'neoship_dpdparcelshop';
+		$this->method_title = __( 'DPD Parcelshop', 'neoship' );
+		$this->title        = __( 'DPD Parcelshop', 'neoship' );
 		$this->init();
 	}
 

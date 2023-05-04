@@ -4,7 +4,7 @@
  *
  * @since      1.0.0
  * @package    Neoship
- * @author     Mirec <hutar@kuskosoft.com>
+ * @author     IT <it@neoship.sk>
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

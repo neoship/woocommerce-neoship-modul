@@ -5,7 +5,7 @@
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
- * @link  https://www.kuskosoft.com
+ * @link  https://www.neoship.sk
  * @since 1.0.0
  *
  * @package    Neoship
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since      1.0.0
  * @package    Neoship
  * @subpackage Neoship/includes
- * @author     Mirec <hutar@kuskosoft.com>
+ * @author     IT <it@neoship.sk>
  */
 class Neoship_I18n {
 

@@ -2,7 +2,7 @@
 /**
  * Register all actions and filters for the plugin
  *
- * @link  https://www.kuskosoft.com
+ * @link  https://www.neoship.sk
  * @since 1.0.0
  *
  * @package    Neoship
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package    Neoship
  * @subpackage Neoship/includes
- * @author     Mirec <hutar@kuskosoft.com>
+ * @author     IT <it@neoship.sk>
  */
 class Neoship_Loader {
 

@@ -57,6 +57,17 @@
 				};
 				ParcelshopIframe.Widget.open(onSelectParcelshop, {shipper_id:3});
 			});
+
+			$( '#dpdparcelshop_name' ).on('click', function(event){
+				event.preventDefault();
+				var onSelectParcelshop = (parcelshop) => {
+					if (parcelshop) {
+						$(this).val(parcelshop.name);
+						$('#dpdparcelshop_id').val(parcelshop.id);
+					}
+				};
+				ParcelshopIframe.Widget.open(onSelectParcelshop, {shipper_id:5});
+			});
 		}
 	);
 

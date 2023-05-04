@@ -4,7 +4,7 @@
  *
  * This file is used to markup the public-facing aspects of the plugin.
  *
- * @link  https://www.kuskosoft.com
+ * @link  https://www.neoship.sk
  * @since 1.0.0
  *
  * @package    Neoship
