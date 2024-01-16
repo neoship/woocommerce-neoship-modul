@@ -72,7 +72,7 @@ class Neoship3_Api {
 		$response = wp_remote_post( $url, $args );
 
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			$this->error_message( __( 'Bad login credentials', 'neoship' ), ! $test );
+			$this->error_message( __( 'Please setup neoship login credentials', 'neoship' ), ! $test );
 			return;
 		}
 
