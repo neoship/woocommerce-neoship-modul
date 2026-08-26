@@ -1281,8 +1281,7 @@ class Neoship_Admin {
 											<label for="packages[<?php echo esc_html( $index ); ?>][insurance]"><?php esc_html_e( 'Amount of insurance', 'neoship' ); ?> (€)</label><br>
 											<input type="number" step="0.01" name="packages[<?php echo esc_html( $index ); ?>][insurance]" value="">
 										</td>
-                                    <?php // 0.9 mirrors the platform default (SPS bills a weightless parcel as 5 kg) and
-                                          // stays off the 1 kg price-band boundary, where the price lookup is ambiguous. ?>
+                                    <?php // 0.9 matches the platform default and stays off the ambiguous 1 kg price band. ?>
                                     <?php if ( $carrier == 'packeta' || $carrier == 'sps' ) { ?>
                                         <td scope="col" class="manage-column">
                                             <label for="packages[<?php echo esc_html( $index ); ?>][weight]">Váha (kg)</label><br>
