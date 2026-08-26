@@ -1281,10 +1281,12 @@ class Neoship_Admin {
 											<label for="packages[<?php echo esc_html( $index ); ?>][insurance]"><?php esc_html_e( 'Amount of insurance', 'neoship' ); ?> (€)</label><br>
 											<input type="number" step="0.01" name="packages[<?php echo esc_html( $index ); ?>][insurance]" value="">
 										</td>
-                                    <?php if ( $carrier == 'packeta') { ?>
+                                    <?php // 0.9 mirrors the platform default (SPS bills a weightless parcel as 5 kg) and
+                                          // stays off the 1 kg price-band boundary, where the price lookup is ambiguous. ?>
+                                    <?php if ( $carrier == 'packeta' || $carrier == 'sps' ) { ?>
                                         <td scope="col" class="manage-column">
                                             <label for="packages[<?php echo esc_html( $index ); ?>][weight]">Váha (kg)</label><br>
-                                            <input type="number" step="0.01" name="packages[<?php echo esc_html( $index ); ?>][weight]" value="1">
+                                            <input type="number" step="0.01" name="packages[<?php echo esc_html( $index ); ?>][weight]" value="0.9">
                                         </td>
 									<?php } if ( $carrier == 'dpd') { ?>
 										<td scope="col" class="manage-column">
