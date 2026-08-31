@@ -13,6 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NEOSHIP_VERSION', '3.3.0' );
+define( 'NEOSHIP_VERSION', '3.4.0' );
 define( 'NEOSHIP_TRACKING_URL', 'https://neoship.sk' );
 define( 'NEOSHIP3_API_URL', 'https://apiserver.neoship.sk/api' );
